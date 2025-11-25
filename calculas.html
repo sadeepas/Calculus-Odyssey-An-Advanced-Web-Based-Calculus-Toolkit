@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Odyssey - Advanced Toolkit</title>
+<link rel="icon" type="image/x-icon" href="calculasico.ico">
+    <!-- External Libraries (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <!--
+    ================================================================
+    ===        MERGED & REFINED APPLICATION STYLESHEET         ===
+    ================================================================
+    -->
+    <style>
+        /* --- Custom Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap');
+
+        /* --- Refined Design System (CSS Variables) --- */
+        :root {
+            --bg-primary: #f0f2f5; --bg-secondary: #e4e6eb; --bg-panel: #ffffff; --bg-tertiary: #f0f2f5;
+            --text-primary: #1a202c; --text-secondary: #4a5568;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.04);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --accent-cyan: #06b6d4; --purple: #a855f7; --success: #22c55e;
+            --warning: #f59e0b; --error: #ef4444; --pink: #ec4899; --blue: #3b82f6;
+            --radius-md: 0.5rem; --radius-lg: 0.75rem;
+            --transition-fast: 200ms; --transition-slow: 350ms;
+        }
+
+        html.dark {
+            --bg-primary: #101010; --bg-panel: #181818; --bg-secondary: #1f1f1f; --bg-tertiary: #2a2a2a;
+            --text-primary: #f0f0f0; --text-secondary: #a0a0a0;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* --- Consistent Component Styles --- */
+        .ui-panel { background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: var(--shadow-md); border-radius: var(--radius-lg); }
+        .input-base { width: 100%; padding: 0.75rem; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); transition: all var(--transition-fast) ease; }
+        .input-base:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-cyan) 25%, transparent); }
+        .btn { transition: all var(--transition-fast) ease; border-radius: var(--radius-md); font-weight: 500; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.65rem 1rem; user-select: none; }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); } .btn:active { transform: translateY(0); box-shadow: none; }
+        .btn-primary { background: var(--accent-cyan); color: #101010; font-weight: 600; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        
+        .dark-panel { background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); border-radius: var(--radius-lg); }
+        .input-modern { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); transition: all var(--transition-fast) ease; border-radius: var(--radius-md); font-family: 'JetBrains Mono', monospace; }
+        .input-modern:focus-within, .input-modern:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-cyan) 25%, transparent); }
+        .toggle-switch { width: 44px; height: 24px; background: var(--bg-tertiary); border-radius: 12px; position: relative; cursor: pointer; transition: all var(--transition-slow) ease; flex-shrink: 0; }
+        .toggle-switch.active { background: var(--accent-cyan); }
+        .toggle-knob { width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: all var(--transition-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+        .toggle-switch.active .toggle-knob { transform: translateX(20px); }
+        .tab-container { display: flex; border-bottom: 1px solid var(--border-color); }
+        .tab-btn { position: relative; transition: color var(--transition-fast) ease; color: var(--text-secondary); flex: 1; padding: 0.75rem; font-size: 0.875rem; font-weight: 500; }
+        .tab-btn::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--accent-cyan); transform: scaleX(0); transition: transform var(--transition-slow) ease; }
+        .tab-btn.tab-active { color: var(--text-primary); } .tab-btn.tab-active::after { transform: scaleX(1); }
+        .math-display { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; font-family: 'JetBrains Mono', 'Noto Sans Sinhala', monospace; font-size: 0.875rem; color: var(--text-secondary); }
+        .math-display strong { color: var(--text-primary); }
+        .function-type-btn { border: 1px solid var(--border-color); background-color: var(--bg-tertiary); padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 0.375rem; }
+        .function-type-btn.active { background-color: var(--accent-cyan); color: #101010; border-color: var(--accent-cyan); font-weight: 600; }
+        
+        /* --- Global Styles & Base Transitions --- */
+        * { transition: background-color var(--transition-fast) ease, color var(--transition-fast) ease, border-color var(--transition-fast) ease, opacity var(--transition-fast) ease, box-shadow var(--transition-fast) ease; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+        .font-mono { font-family: 'JetBrains Mono', 'Noto Sans Sinhala', monospace; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #4b5568; border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* --- Mobile Navigation Specific Styles --- */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 1023px) {
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                z-index: 40; /* Below the backdrop */
+            }
+            #sidebar.is-open {
+                transform: translateX(0);
+            }
+            #mobile-backdrop {
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0,0,0,0.6);
+                backdrop-filter: blur(4px);
+                z-index: 39;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease-in-out;
+            }
+            #mobile-backdrop.is-open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        /* --- Animation Keyframes & Utils --- */
+        @keyframes subtle-slide-up-fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .page-animate-in > * { animation: subtle-slide-up-fade-in 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; animation-delay: var(--delay); opacity: 0; }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
+        @keyframes result-flash { 0% { background-color: transparent; } 50% { background-color: color-mix(in srgb, var(--accent-cyan) 20%, transparent); } 100% { background-color: transparent; } }
+        .animate-result-flash { animation: result-flash 0.8s ease-out; }
+        @keyframes slide-down-fade-in { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-down-in { animation: slide-down-fade-in 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes flash-success-border { 50% { border-color: var(--success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 25%, transparent); } }
+        .animate-flash-success { animation: flash-success-border 0.7s ease-out; }
+        @keyframes flash-error-border { 50% { border-color: var(--error); box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 25%, transparent); } }
+        .animate-flash-error { animation: flash-error-border 0.7s ease-out; }
+        @keyframes shake-horizontal { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+        .animate-shake { animation: shake-horizontal 0.5s ease-in-out; }
+        
+        #loading-screen { opacity: 1; transition: opacity 0.5s ease-out; }
+        #loading-screen.hidden { opacity: 0; pointer-events: none; }
+        #wave-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw-wave 2.5s ease-in-out infinite alternate; }
+        @keyframes draw-wave { to { stroke-dashoffset: 0; } }
+        @keyframes text-glow { 0%, 100% { text-shadow: 0 0 5px var(--accent-cyan), 0 0 10px var(--purple); } 50% { text-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--purple); } }
+        #loading-screen h1 { animation: text-glow 2s ease-in-out infinite alternate; }
+        
+        #help-modal { opacity: 0; transition: opacity 0.3s ease-out; pointer-events: none; }
+        #help-modal.visible { opacity: 1; pointer-events: auto; }
+        #help-modal .ui-panel { transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+        #help-modal.visible .ui-panel { transform: scale(1); }
+        
+        .prose h3 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .prose p { margin-bottom: 1rem; line-height: 1.65; color: var(--text-secondary); }
+        .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .prose li { margin-bottom: 0.5rem; }
+        .prose code { background-color: var(--bg-tertiary); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'JetBrains Mono', monospace; color: var(--pink); }
+        .prose strong { color: var(--text-primary); }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-500/20">
+
+    <!-- === Loading Screen === -->
+    <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black font-mono">
+        <div id="loading-content" class="flex flex-col items-center justify-center text-center animate-fade-in">
+             <svg width="200" height="100" viewBox="0 0 200 100" class="mb-6">
+                <path id="wave-path" d="M 0 50 Q 50 0, 100 50 T 200 50" stroke="url(#wave-gradient)" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <defs>
+                    <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:var(--accent-cyan);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:var(--purple);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-3">Calculus Odyssey</h1>
+            <p id="loading-status" class="w-64 h-5 transition-all duration-300 text-gray-400">Initializing Engine...</p>
+        </div>
+    </div>
+
+    <div id="app" class="relative min-h-screen lg:flex">
+
+        <!-- Mobile Backdrop -->
+        <div id="mobile-backdrop"></div>
+
+        <!-- === Sidebar Navigation === -->
+        <aside id="sidebar" class="w-64 bg-panel/80 dark:bg-panel/80 backdrop-blur-xl border-r border-[var(--border-color)] flex-shrink-0 flex flex-col">
+            <div class="p-4 h-16 flex items-center justify-start border-b border-[var(--border-color)] flex-shrink-0">
+                 <svg class="w-10 h-10 text-cyan-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                <span class="text-xl font-bold ml-3 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-purple-500">Calculus Odyssey</span>
+            </div>
+            <nav id="main-nav" class="flex-1 mt-4 space-y-2 px-2 overflow-y-auto"></nav>
+            <div class="p-2 border-t border-[var(--border-color)] flex-shrink-0 space-y-1">
+                <button id="help-btn" class="w-full flex items-center justify-start px-3 py-3 text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] rounded-lg transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="ml-4" data-lang-key="sidebar_help">Help</span>
+                </button>
+                <button id="language-toggle" class="w-full flex items-center justify-start px-3 py-3 text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] rounded-lg transition-colors">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C13.18 7.061 14.287 7.5 15.5 7.5c1.213 0 2.32-.439 3.166-1.136m0-1.414V3" /></svg>
+                    <span class="ml-4" data-lang-key="sidebar_language">Language</span>
+                </button>
+                <button id="theme-toggle" class="w-full flex items-center justify-start px-3 py-3 text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] rounded-lg transition-colors">
+                    <svg id="theme-icon-light" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg id="theme-icon-dark" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <span class="ml-4" data-lang-key="sidebar_theme">Toggle Theme</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- === Main Content Area === -->
+        <div class="flex-1 flex flex-col h-screen">
+             <!-- Mobile Header -->
+            <header class="lg:hidden h-16 flex items-center justify-between px-4 bg-[var(--bg-panel)] border-b border-[var(--border-color)] flex-shrink-0">
+                <button id="hamburger-btn" class="p-2 text-[var(--text-primary)]">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+                <span class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-purple-500">Calculus Odyssey</span>
+                <div class="w-8"></div> <!-- Spacer -->
+            </header>
+            <main id="main-content" class="flex-1 overflow-y-auto"></main>
+        </div>
+    </div>
+
+    <!-- === Global Help Modal (IMPROVED ANIMATION) === -->
+    <div id="help-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" id="help-modal-backdrop"></div>
+        <div class="ui-panel w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 z-10">
+            <div class="flex justify-between items-center mb-4 sticky top-0 bg-[var(--bg-panel)] py-2 -mt-2">
+                <h2 id="help-modal-title" class="text-2xl font-bold"></h2>
+                <button id="help-modal-close-btn" class="p-2 text-2xl leading-none hover:text-[var(--error)] transition-colors">&times;</button>
+            </div>
+            <div class="prose max-w-full" id="help-modal-content"></div>
+        </div>
+    </div>
+    
+    <!--
+    ================================================================
+    ===                     PAGE TEMPLATES                       ===
+    ================================================================
+    -->
+    <template id="page-calculator">
+        <div class="page-animate-in space-y-6 p-4 sm:p-6 lg:p-8">
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400" style="--delay: 100ms;" data-lang-key="calc_title">Symbolic Calculator</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3 space-y-6">
+                    <div class="ui-panel p-6" style="--delay: 200ms;">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="expression" class="block text-sm font-medium text-[var(--text-secondary)] mb-2" data-lang-key="calc_expr_label">Enter Expression or Equation</label>
+                                <input type="text" id="expression" class="input-base font-mono">
+                            </div>
+                            <div>
+                                <label for="operation" class="block text-sm font-medium text-[var(--text-secondary)] mb-2" data-lang-key="calc_op_label">Select Operation</label>
+                                <select id="operation" class="input-base">
+                                    <option value="evaluate" data-lang-key="calc_op_eval">Evaluate</option>
+                                    <option value="simplify" data-lang-key="calc_op_simplify">Simplify</option>
+                                    <option value="derivative" data-lang-key="calc_op_deriv">Derivative (w.r.t x)</option>
+                                    <option value="integral" data-lang-key="calc_op_integral">Integral (w.r.t x)</option>
+                                    <option value="solve" data-lang-key="calc_op_solve">Solve Equation for x</option>
+                                </select>
+                            </div>
+                            <button id="calculate-btn" class="btn btn-primary w-full py-3" data-lang-key="calc_calc_btn">Calculate</button>
+                        </div>
+                    </div>
+                    <div class="ui-panel p-6" style="--delay: 300ms;">
+                        <h2 class="text-xl font-semibold mb-2" data-lang-key="calc_result_title">Result</h2>
+                        <div id="result" class="p-4 rounded-lg bg-[var(--bg-secondary)] min-h-[80px] font-mono text-lg text-teal-500 dark:text-teal-400 whitespace-pre-wrap break-words transition-colors duration-300"></div>
+                    </div>
+                </div>
+                <aside class="lg:col-span-2 ui-panel p-6" style="--delay: 400ms;">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold" data-lang-key="calc_history_title">History</h2>
+                        <button id="clear-history-btn" class="text-sm text-[var(--text-secondary)] hover:text-[var(--error)]" data-lang-key="calc_clear_btn">Clear</button>
+                    </div>
+                    <div id="history-list" class="space-y-3 overflow-y-auto max-h-[65vh]"></div>
+                </aside>
+            </div>
+        </div>
+    </template>
+
+    <template id="page-matrix">
+        <div class="page-animate-in p-4 sm:p-6 lg:p-8">
+            <h1 class="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-yellow-500" style="--delay: 100ms;" data-lang-key="matrix_title">Matrix Calculator</h1>
+            <div class="ui-panel p-6" style="--delay: 200ms;">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="matrix-a" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="matrix_a_label">Matrix A (e.g., [[1, 2], [3, 4]])</label>
+                            <textarea id="matrix-a" rows="4" class="input-base font-mono">[[1, 2], [3, 4]]</textarea>
+                        </div>
+                         <div>
+                            <label for="matrix-b" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="matrix_b_label">Matrix B (for binary operations)</label>
+                            <textarea id="matrix-b" rows="4" class="input-base font-mono">[[5, 6], [7, 8]]</textarea>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="matrix-operation" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="matrix_op_label">Operation</label>
+                            <select id="matrix-operation" class="input-base">
+                                <option value="det" data-lang-key="matrix_op_det">Determinant (A)</option>
+                                <option value="inv" data-lang-key="matrix_op_inv">Inverse (A)</option>
+                                <option value="transpose" data-lang-key="matrix_op_transpose">Transpose (A)</option>
+                                <option value="eigen" data-lang-key="matrix_op_eigen">Eigenvalues (A)</option>
+                                <option value="multiply" data-lang-key="matrix_op_multiply">Multiply (A * B)</option>
+                            </select>
+                        </div>
+                        <button id="matrix-calculate-btn" class="btn btn-primary w-full py-3" data-lang-key="matrix_calc_btn">Calculate</button>
+                        <div>
+                             <h3 class="text-lg font-semibold mt-4" data-lang-key="matrix_result_title">Result:</h3>
+                             <pre id="matrix-result" class="p-4 mt-2 rounded-lg bg-[var(--bg-secondary)] min-h-[150px] font-mono text-yellow-600 dark:text-yellow-400 whitespace-pre-wrap break-words transition-colors duration-300"></pre>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </template>
+    
+    <template id="page-graphing">
+        <div class="h-full flex flex-col">
+             <!-- Desktop Header -->
+            <header class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-shrink-0 w-full hidden lg:block">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-4 page-animate-in" style="--delay: 100ms;">
+                        <svg class="w-10 h-10 text-cyan-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M18.7 8a5 5 0 0 1-5.3 5.3L8 18.7"/></svg>
+                        <div>
+                            <h1 class="text-xl font-bold text-text-primary" data-lang-key="graphing_title">Interactive Canvas & Analysis Engine</h1>
+                            <p class="text-sm text-text-secondary" data-lang-key="graphing_subtitle">Visualize, Analyze, and Interact with Mathematical Functions</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 page-animate-in" style="--delay: 200ms;">
+                        <button id="resetBtn" data-lang-key="graphing_reset_tooltip" title="Reset All" class="btn bg-error/80 hover:bg-error text-white p-2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+    
+            <main class="max-w-8xl mx-auto p-4 sm:px-6 lg:px-8 flex-1 w-full min-h-0">
+              <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+                <!-- Canvas Area -->
+                <div class="lg:col-span-3 page-animate-in h-full flex flex-col min-h-[400px] lg:min-h-0" style="--delay: 600ms;">
+                  <div class="dark-panel p-2 sm:p-4 relative w-full h-full">
+                    <canvas id="graphCanvas" class="w-full h-full rounded-lg cursor-grab touch-none"></canvas>
+                    <div class="absolute top-4 right-4 p-2 flex flex-col space-y-2 z-10">
+                        <button id="shareBtn" class="btn btn-primary w-10 h-10 !p-0" data-lang-key="graphing_share_tooltip" title="Copy Share Link">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.875-1.975l-4.94-2.47a3.027 3.027 0 000-.972l4.94-2.47A3 3 0 0015 8z" /></svg>
+                        </button>
+                        <button id="uploadExportBtn" class="btn btn-secondary w-10 h-10 !p-0" data-lang-key="graphing_upload_export_tooltip" title="Upload / Export">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute top-4 left-4 p-2 flex space-x-2 z-10">
+                        <button id="zoomIn" class="btn btn-secondary w-10 h-10 !p-0 text-lg" title="Zoom In">+</button>
+                        <button id="zoomOut" class="btn btn-secondary w-10 h-10 !p-0 text-lg" title="Zoom Out">−</button>
+                        <button id="resetView" class="btn btn-secondary w-10 h-10 !p-0 text-lg" data-lang-key="graphing_reset_view_tooltip" title="Reset View">⌂</button>
+                    </div>
+                    <div id="cursorInfo" class="absolute bottom-4 left-4 dark-panel text-sm font-mono opacity-0 transition-opacity p-2 rounded-md pointer-events-none"></div>
+                    <div id="tooltip" class="absolute dark-panel text-sm font-mono opacity-0 transition-opacity p-2 rounded-md pointer-events-none z-20"></div>
+                  </div>
+                </div>
+                <!-- Controls Sidebar -->
+                <aside class="lg:col-span-1 space-y-6 flex flex-col overflow-y-auto">
+                  <div class="dark-panel p-6 page-animate-in" style="--delay: 300ms;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold" data-lang-key="graphing_eq_title">Equations</h2>
+                        <button id="addFunctionBtn" class="btn btn-primary w-9 h-9 !rounded-full !p-0 text-xl">+</button>
+                    </div>
+                    <div id="functionsList" class="space-y-4 mb-4"></div>
+                    <select id="presetSelect" class="input-modern w-full px-3 py-2 text-sm">
+                        <option value="" data-lang-key="graphing_presets">Load Preset...</option>
+                        <optgroup label="Cartesian"><option value='{"type":"cartesian","expr":"x^3 - 4*x"}'>x³ - 4x</option><option value='{"type":"cartesian","expr":"x*sin(1/x)"}'>x*sin(1/x)</option><option value='{"type":"cartesian","expr":"exp(-x^2)"}'>e⁻ˣ² (Bell Curve)</option></optgroup>
+                        <optgroup label="Parametric"><option value='{"type":"parametric","xExpr":"4*cos(t)","yExpr":"3*sin(t)"}'>Ellipse</option><option value='{"type":"parametric","xExpr":"t-sin(t)","yExpr":"1-cos(t)"}'>Cycloid</option></optgroup>
+                        <optgroup label="Polar"><option value='{"type":"polar","expr":"2*cos(3*t)"}'>Rose Curve</option><option value='{"type":"polar","expr":"1+cos(t)"}'>Cardioid</option></optgroup>
+                    </select>
+                  </div>
+    
+                  <div class="dark-panel page-animate-in flex flex-col" style="--delay: 400ms;">
+                    <div class="tab-container flex-shrink-0"><button class="tab-btn tab-active" data-tab="analysis" data-lang-key="graphing_tab_analysis">Analysis</button><button class="tab-btn" data-tab="apps" data-lang-key="graphing_tab_apps">Applications</button></div>
+                    <div class="p-6 overflow-y-auto">
+                      <div class="mb-4"><label class="block text-sm font-medium mb-2" data-lang-key="graphing_target_fn_label">Target for Analysis</label><select id="targetFunction" class="input-modern w-full px-3 py-2 text-sm"></select></div>
+                      <div id="tab-content-wrapper" class="relative">
+                        <div id="analysisTab" class="space-y-4">
+                          <div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_show_tangent_label">Show Tangent Line</label><div class="toggle-switch active" data-setting="showTangent"><div class="toggle-knob"></div></div></div>
+                          <div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_crit_pts_label">Show Critical Points</label><div class="toggle-switch" data-setting="showCriticalPoints"><div class="toggle-knob"></div></div></div>
+                          <div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_intersections_label">Show Intersections</label><div class="toggle-switch" data-setting="showIntersections"><div class="toggle-knob"></div></div></div>
+                          <div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_show_derivative_plot_label">Plot Derivative</label><div class="toggle-switch" data-setting="showDerivativePlot"><div class="toggle-knob"></div></div></div>
+                          <hr class="border-[var(--border-color)] !my-4"><h3 class="font-semibold" data-lang-key="graphing_newton_method_title">Newton's Method</h3>
+                          <div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_show_newton_label">Visualize Newton's Method</label><div class="toggle-switch" data-setting="showNewton"><div class="toggle-knob"></div></div></div>
+                          <div><label class="block text-xs text-[var(--text-secondary)] mb-1" data-lang-key="graphing_newton_start_label">Starting point x₀</label><input type="number" id="newtonX0" value="2.5" step="0.1" class="input-modern w-full px-2 py-1 text-sm"></div>
+                        </div>
+                        <div id="appsTab" class="hidden space-y-4">
+                           <h3 class="font-semibold" data-lang-key="graphing_integral_title">Definite Integral</h3>
+                           <div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_show_area_label">Show Area Under Curve</label><div class="toggle-switch active" data-setting="showIntegral"><div class="toggle-knob"></div></div></div>
+                           <div class="grid grid-cols-2 gap-2"><div><label class="block text-xs text-[var(--text-secondary)] mb-1" data-lang-key="graphing_lower_bound_label">Lower Bound (a)</label><input type="number" id="integralA" value="0" step="0.1" class="input-modern w-full px-2 py-1 text-sm"></div><div><label class="block text-xs text-[var(--text-secondary)] mb-1" data-lang-key="graphing_upper_bound_label">Upper Bound (b)</label><input type="number" id="integralB" value="3" step="0.1" class="input-modern w-full px-2 py-1 text-sm"></div></div>
+                           <div class="math-display" id="integralInfo"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dark-panel p-6 page-animate-in flex-shrink-0" style="--delay: 500ms;">
+                     <h3 class="text-lg font-semibold mb-4" data-lang-key="graphing_view_settings_title">View Settings</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-4"><input type="number" id="xMin" value="-10" class="input-modern px-3 py-2 text-sm" title="X-axis minimum"><input type="number" id="xMax" value="10" class="input-modern px-3 py-2 text-sm" title="X-axis maximum"><input type="number" id="yMin" value="-10" class="input-modern px-3 py-2 text-sm" title="Y-axis minimum"><input type="number" id="yMax" value="10" class="input-modern px-3 py-2 text-sm" title="Y-axis maximum"></div>
+                    <button id="autoFitBtn" class="btn btn-secondary w-full" data-lang-key="graphing_autofit_btn">Auto-Fit View</button>
+                    <div class="space-y-3 mt-4"><div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_grid_label">Grid</label><div class="toggle-switch active" data-setting="showGrid"><div class="toggle-knob"></div></div></div><div class="flex items-center justify-between"><label class="text-sm font-medium" data-lang-key="graphing_axes_label">Axes</label><div class="toggle-switch active" data-setting="showAxes"><div class="toggle-knob"></div></div></div></div>
+                  </div>
+                </aside>
+              </div>
+            </main>
+        </div>
+    </template>
+    
+    <template id="page-practice">
+        <div class="page-animate-in p-4 sm:p-6 lg:p-8">
+            <div class="ui-panel max-w-3xl mx-auto p-6" style="--delay: 100ms;">
+                <h1 class="text-3xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-cyan-500" data-lang-key="practice_title">Practice Lab</h1>
+                <div class="mb-4">
+                    <label for="problem-topic" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="practice_topic_label">Select Topic</label>
+                    <select id="problem-topic" class="input-base">
+                        <option value="derivatives" data-lang-key="practice_topic_deriv">Derivatives</option>
+                        <option value="integrals" data-lang-key="practice_topic_integral">Integrals</option>
+                    </select>
+                </div>
+                <div id="problem-container" class="p-6 rounded-lg bg-[var(--bg-secondary)] shadow-inner transition-transform duration-300">
+                    <h2 id="problem-title" class="text-xl font-semibold"></h2>
+                    <p id="problem-question" class="mt-2 text-lg font-mono"></p>
+                    <input type="text" id="user-answer" class="input-base mt-4" data-lang-key="practice_answer_placeholder" placeholder="Your Answer...">
+                    <p id="feedback" class="mt-4 h-6 text-center font-semibold"></p>
+                </div>
+                <div class="mt-4 flex flex-col sm:flex-row gap-4">
+                    <button id="submit-answer" class="btn btn-primary flex-1 py-3" data-lang-key="practice_check_btn">Check Answer</button>
+                    <button id="next-problem" class="btn btn-secondary flex-1 py-3" data-lang-key="practice_next_btn">Next Problem</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="page-converter">
+        <div class="page-animate-in p-4 sm:p-6 lg:p-8">
+            <div class="ui-panel max-w-2xl mx-auto p-6" style="--delay: 100ms;">
+                <h1 class="text-3xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500" data-lang-key="converter_title">Unit Converter</h1>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label for="unit-input" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="converter_value_label">Value</label>
+                        <input type="number" id="unit-input" value="1" class="input-base font-mono">
+                    </div>
+                    <div>
+                        <label for="unit-from" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="converter_from_label">From</label>
+                        <select id="unit-from" class="input-base"></select>
+                    </div>
+                    <div>
+                        <label for="unit-to" class="block text-sm font-medium text-[var(--text-secondary)] mb-1" data-lang-key="converter_to_label">To</label>
+                        <select id="unit-to" class="input-base"></select>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <p class="text-[var(--text-secondary)]" data-lang-key="converter_result_title">Result:</p>
+                    <p id="unit-result" class="text-3xl font-bold font-mono text-purple-600 dark:text-purple-400 break-all"></p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="page-library">
+        <div class="page-animate-in p-4 sm:p-6 lg:p-8">
+            <h1 class="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-red-500" style="--delay: 100ms;" data-lang-key="library_title">Formula & Theorem Library</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="ui-panel p-6 space-y-4" style="--delay: 200ms;">
+                    <h2 class="text-2xl font-semibold border-b pb-2 border-[var(--border-color)]" data-lang-key="library_deriv_title">Common Derivatives</h2>
+                    <div class="font-mono text-sm space-y-2">
+                        <p>d/dx(xⁿ) = nxⁿ⁻¹</p><p>d/dx(sin(x)) = cos(x)</p><p>d/dx(cos(x)) = -sin(x)</p><p>d/dx(eˣ) = eˣ</p><p>d/dx(ln(x)) = 1/x</p>
+                    </div>
+                </div>
+                <div class="ui-panel p-6 space-y-4" style="--delay: 300ms;">
+                    <h2 class="text-2xl font-semibold border-b pb-2 border-[var(--border-color)]" data-lang-key="library_integral_title">Common Integrals</h2>
+                    <div class="font-mono text-sm space-y-2">
+                        <p>∫xⁿ dx = (xⁿ⁺¹)/(n+1) + C</p><p>∫cos(x) dx = sin(x) + C</p><p>∫sin(x) dx = -cos(x) + C</p><p>∫eˣ dx = eˣ + C</p><p>∫1/x dx = ln|x| + C</p>
+                    </div>
+                </div>
+                <div class="md:col-span-2 ui-panel p-6 space-y-4" style="--delay: 400ms;">
+                    <h2 class="text-2xl font-semibold border-b pb-2 border-[var(--border-color)]" data-lang-key="library_theorems_title">Key Theorems</h2>
+                    <div>
+                        <h3 class="font-semibold text-lg" data-lang-key="library_ftc_title">Fundamental Theorem of Calculus</h3>
+                        <p class="mt-1 text-sm text-[var(--text-secondary)]" data-lang-key="library_ftc_desc">If f is continuous on [a, b] and F'(x) = f(x), then ∫ₐᵇ f(x) dx = F(b) - F(a).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- === HELP CONTENT SOURCES (HIDDEN) === -->
+    <div id="help-content-sources" class="hidden">
+        <div data-page="#graphing">
+            <h3 data-lang-key="help_graphing_title_1">Getting Started: Plotting Your First Function</h3>
+            <p data-lang-key="help_graphing_p_1">Welcome to the interactive graphing laboratory! Getting your ideas onto the canvas is simple:</p>
+            <ul>
+                <li data-lang-key="help_graphing_li_1"><strong>Direct Input:</strong> The easiest way is to type your mathematical expression directly into an input box under the "Equations" panel. For example, to plot a parabola, simply type <code>x^2</code>. The graph will update automatically as you type.</li>
+                <li data-lang-key="help_graphing_li_2"><strong>Adding More Graphs:</strong> Click the large blue "+" button to add a new function to the canvas. You can plot multiple functions simultaneously to compare their behaviors.</li>
+                <li data-lang-key="help_graphing_li_3"><strong>Changing Function Type:</strong> Each function can be Cartesian (y=f(x)), Parametric, or Polar. Click the 'C', 'P', or 'R' buttons on any function card to switch its type and reveal the appropriate input fields.</li>
+                <li data-lang-key="help_graphing_li_4"><strong>Loading Presets:</strong> Don't know what to plot? Use the "Load Preset..." dropdown to explore interesting and classic curves like the Cycloid, Cardioid, or Bell Curve.</li>
+            </ul>
+            <h3 data-lang-key="help_graphing_title_2">Interactive Analysis</h3>
+            <p data-lang-key="help_graphing_p_2">This tool is more than just a plotter. Use the "Analysis" and "Applications" tabs to explore calculus concepts visually:</p>
+            <ul>
+                <li data-lang-key="help_graphing_li_5"><strong>Tangent Line:</strong> Select a target function, enable "Show Tangent Line", and move your mouse (or finger on mobile) over the graph to see the live tangent and its properties.</li>
+                <li data-lang-key="help_graphing_li_6"><strong>Critical Points & Intersections:</strong> Toggle switches to automatically find and plot local maxima/minima and the points where different graphs cross.</li>
+                <li data-lang-key="help_graphing_li_7"><strong>Definite Integrals:</strong> Switch to the "Applications" tab to visualize the area under a curve between two bounds, `a` and `b`. The calculated area is updated in real-time.</li>
+            </ul>
+        </div>
+        <div data-page="#calculator">
+            <h3 data-lang-key="help_calc_title_1">Using the Symbolic Calculator</h3>
+            <p data-lang-key="help_calc_p_1">This tool performs symbolic math operations. Enter a mathematical expression and choose an operation from the dropdown menu.</p>
+            <ul>
+                <li data-lang-key="help_calc_li_1"><strong>Evaluate:</strong> Computes the numerical result of an expression. E.g., <code>2 * (3 + 4)</code> results in <code>14</code>.</li>
+                <li data-lang-key="help_calc_li_2"><strong>Simplify:</strong> Simplifies algebraic expressions. E.g., <code>x + x + y</code> simplifies to <code>2x + y</code>.</li>
+                <li data-lang-key="help_calc_li_3"><strong>Derivative:</strong> Finds the derivative of an expression with respect to `x`. E.g., <code>x^2</code> results in <code>2x</code>.</li>
+                <li data-lang-key="help_calc_li_4"><strong>Integral:</strong> Finds the indefinite integral with respect to `x`. E.g., <code>2x</code> results in <code>x^2 + C</code>.</li>
+                <li data-lang-key="help_calc_li_5"><strong>Solve:</strong> Solves an equation for `x`. E.g., <code>2x - 4 = 0</code> results in <code>x = 2</code>.</li>
+            </ul>
+            <p data-lang-key="help_calc_p_2">Your calculations are automatically saved in the History panel. You can click any history item to load it back into the calculator.</p>
+        </div>
+        <div data-page="#matrix">
+            <h3 data-lang-key="help_matrix_title_1">Working with Matrices</h3>
+            <p data-lang-key="help_matrix_p_1">The Matrix Calculator uses a specific format for input. Matrices must be entered as nested arrays inside square brackets.</p>
+            <ul>
+                <li data-lang-key="help_matrix_li_1"><strong>Example Format:</strong> A 2x2 matrix like <code>[[a, b], [c, d]]</code> should be typed as <code>[[1, 2], [3, 4]]</code>.</li>
+                <li data-lang-key="help_matrix_li_2"><strong>Matrix A</strong> is used for all operations.</li>
+                <li data-lang-key="help_matrix_li_3"><strong>Matrix B</strong> is only used for binary operations like multiplication.</li>
+            </ul>
+            <p data-lang-key="help_matrix_p_2">Select the desired operation from the dropdown and click "Calculate". The result will be formatted and displayed below.</p>
+        </div>
+        <div data-page="#practice">
+            <h3 data-lang-key="help_practice_title_1">Practice Your Skills</h3>
+            <p data-lang-key="help_practice_p_1">The Practice Lab generates random problems for you to solve, helping you sharpen your calculus skills.</p>
+            <ol>
+                <li data-lang-key="help_practice_li_1">1. Select a topic (e.g., Derivatives).</li>
+                <li data-lang-key="help_practice_li_2">2. The tool will display a problem.</li>
+                <li data-lang-key="help_practice_li_3">3. Type your answer into the input field. Make sure to use correct mathematical syntax (e.g., <code>4*x^3</code> for 4x³).</li>
+                <li data-lang-key="help_practice_li_4">4. Click "Check Answer" to get immediate feedback.</li>
+                <li data-lang-key="help_practice_li_5">5. Click "Next Problem" for a new challenge.</li>
+            </ol>
+        </div>
+        <div data-page="#converter">
+            <h3 data-lang-key="help_converter_title_1">How to Use the Unit Converter</h3>
+            <p data-lang-key="help_converter_p_1">This tool allows for quick conversion between various units of measurement.</p>
+            <ol>
+                <li data-lang-key="help_converter_li_1">1. Enter the numerical value you wish to convert in the "Value" field.</li>
+                <li data-lang-key="help_converter_li_2">2. Select the starting unit from the "From" dropdown.</li>
+                <li data-lang-key="help_converter_li_3">3. Select the target unit from the "To" dropdown.</li>
+            </ol>
+            <p data-lang-key="help_converter_p_2">The result is calculated and displayed automatically. The dropdowns are grouped by measurement type (e.g., Length, Mass) for easy navigation.</p>
+        </div>
+        <div data-page="#library">
+            <h3 data-lang-key="help_library_title_1">Formula & Theorem Library</h3>
+            <p data-lang-key="help_library_p_1">This section serves as a quick reference for some of the most common formulas and important theorems in introductory calculus.</p>
+            <p data-lang-key="help_library_p_2">It is not interactive, but provides a handy cheat-sheet if you need to quickly recall a specific rule or theorem while working in the other tools.</p>
+        </div>
+    </div>
+    
+    <!--
+    ================================================================
+    ===               MAIN APPLICATION SCRIPT                    ===
+    ================================================================
+    -->
+    <script>
+    // --- APP INITIALIZATION & GLOBAL HELPERS ---
+    document.addEventListener('DOMContentLoaded', () => {
+        LoadingScreen.init();
+        window.CalculusOdysseyApp = new App();
+        window.CalculusOdysseyApp.init();
+    });
+
+    const LoadingScreen = {
+        statusMessages: ["Initializing Engine...", "Compiling Functions...", "Calculating Constants...", "Plotting Trajectories..."],
+        statusElement: null, intervalId: null,
+        init() {
+            this.statusElement = document.getElementById("loading-status"); let msgIndex = 0;
+            this.statusElement.textContent = this.statusMessages[0];
+            this.intervalId = setInterval(() => {
+                msgIndex = (msgIndex + 1) % this.statusMessages.length; this.statusElement.style.opacity = "0";
+                setTimeout(() => { this.statusElement.textContent = this.statusMessages[msgIndex]; this.statusElement.style.opacity = "1"; }, 300);
+            }, 2500);
+        },
+        hide() {
+            const screen = document.getElementById("loading-screen");
+            if (screen) {
+                screen.classList.add("hidden"); clearInterval(this.intervalId);
+                screen.addEventListener("transitionend", () => screen.style.display = "none", { once: true });
+            }
+        }
+    };
+    
+    const T = (key, lang, translations) => {
+        return translations[lang]?.[key] || translations.en[key] || `MISSING: ${key}`;
+    };
+
+    class App {
+        constructor() {
+            this.state = { theme: 'dark', language: 'en', history: [], currentPage: '#graphing', graphingState: null };
+            this.elements = {
+                sidebar: document.getElementById('sidebar'),
+                hamburgerBtn: document.getElementById('hamburger-btn'),
+                mobileBackdrop: document.getElementById('mobile-backdrop'),
+                mainNav: document.getElementById('main-nav'), mainContent: document.getElementById('main-content'),
+                themeToggle: document.getElementById('theme-toggle'), themeIconLight: document.getElementById('theme-icon-light'),
+                themeIconDark: document.getElementById('theme-icon-dark'),
+                languageToggle: document.getElementById('language-toggle'),
+                helpBtn: document.getElementById('help-btn'),
+                helpModal: document.getElementById('help-modal'),
+                helpModalTitle: document.getElementById('help-modal-title'),
+                helpModalContent: document.getElementById('help-modal-content'),
+                helpModalCloseBtn: document.getElementById('help-modal-close-btn'),
+                helpModalBackdrop: document.getElementById('help-modal-backdrop'),
+            };
+            this.pages = {
+                '#graphing': { titleKey: 'nav_graphing', template: 'page-graphing', icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18" /><path d="M18.7 8a5 5 0 0 1-5.3 5.3L8 18.7" /></svg>` },
+                '#calculator': { titleKey: 'nav_calculator', template: 'page-calculator', icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M12 8h.01M15 8h.01M15 14h.01M12 17h.01M15 17h.01M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>` },
+                '#matrix': { titleKey: 'nav_matrix', template: 'page-matrix', icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>` },
+                '#practice': { titleKey: 'nav_practice', template: 'page-practice', icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"/></svg>` },
+                '#converter': { titleKey: 'nav_converter', template: 'page-converter', icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>` },
+                '#library': { titleKey: 'nav_library', template: 'page-library', icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>` }
+            };
+            this.pageModules = {
+                calculator: new CalculatorModule(this), matrix: new MatrixModule(this),
+                graphing: new GraphingModule(this), practice: new PracticeModule(this),
+                converter: new ConverterModule(this),
+            };
+            this.translations = this.getTranslations();
+        }
+
+        init() {
+            setTimeout(() => LoadingScreen.hide(), 2200);
+            this.loadState();
+            this.setupEventListeners();
+            this.applyTheme();
+            this.handleRouting();
+        }
+
+        loadState() {
+            const savedState = localStorage.getItem('calculusOdysseyState');
+            if (savedState) { this.state = { ...this.state, ...JSON.parse(savedState) }; }
+        }
+
+        saveState() {
+            if (this.pageModules.graphing && this.pageModules.graphing.isInitialized) {
+                this.state.graphingState = this.pageModules.graphing.getModuleState();
+            }
+            localStorage.setItem('calculusOdysseyState', JSON.stringify(this.state));
+        }
+        
+        setupEventListeners() {
+            this.elements.hamburgerBtn.addEventListener('click', () => this.toggleSidebar());
+            this.elements.mobileBackdrop.addEventListener('click', () => this.toggleSidebar(false));
+            this.elements.themeToggle.addEventListener('click', () => this.toggleTheme());
+            this.elements.languageToggle.addEventListener('click', () => this.toggleLanguage());
+            this.elements.helpBtn.addEventListener('click', () => this.showHelpModal());
+            this.elements.helpModalCloseBtn.addEventListener('click', () => this.hideHelpModal());
+            this.elements.helpModalBackdrop.addEventListener('click', () => this.hideHelpModal());
+            window.addEventListener('hashchange', () => this.handleRouting());
+            // Close sidebar when a nav link is clicked
+            this.elements.mainNav.addEventListener('click', (e) => {
+                if (e.target.closest('a')) {
+                    this.toggleSidebar(false);
+                }
+            });
+        }
+        
+        toggleSidebar(forceState) {
+            const shouldBeOpen = typeof forceState === 'boolean' ? forceState : !this.elements.sidebar.classList.contains('is-open');
+            this.elements.sidebar.classList.toggle('is-open', shouldBeOpen);
+            this.elements.mobileBackdrop.classList.toggle('is-open', shouldBeOpen);
+        }
+
+        handleRouting() {
+            const hash = window.location.hash || '#graphing';
+            if (this.pages[hash]) {
+                this.state.currentPage = hash; 
+                this.renderPage(hash);
+                this.updateActiveNav();
+                this.saveState();
+            } else {
+                window.location.hash = '#graphing';
+            }
+        }
+
+        renderPage(pageId) {
+            const main = this.elements.mainContent;
+            const pageTemplate = document.getElementById(this.pages[pageId].template);
+            main.innerHTML = '';
+            main.appendChild(pageTemplate.content.cloneNode(true));
+            this.initPageScript(pageId);
+            this.applyLanguage();
+        }
+
+        initPageScript(pageId) {
+            const moduleName = pageId.substring(1);
+            if (this.pageModules[moduleName] && this.pageModules[moduleName].init) {
+                this.pageModules[moduleName].init();
+            }
+        }
+        
+        renderNav() {
+             this.elements.mainNav.innerHTML = Object.entries(this.pages)
+                .map(([id, { titleKey, icon }]) => `
+                    <a href="${id}" data-navid="${id}" class="nav-link relative flex items-center justify-start p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-all">
+                        ${icon}
+                        <span class="ml-4 font-semibold" data-lang-key="${titleKey}">${T(titleKey, this.state.language, this.translations)}</span>
+                    </a>
+                `).join('');
+        }
+        
+        updateActiveNav() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-cyan-500/10', 'text-cyan-500', 'dark:bg-cyan-500/20', 'dark:text-cyan-400');
+                if (link.dataset.navid === this.state.currentPage) {
+                    link.classList.add('bg-cyan-500/10', 'text-cyan-500', 'dark:bg-cyan-500/20', 'dark:text-cyan-400');
+                }
+            });
+        }
+        
+        applyTheme() { 
+            document.documentElement.classList.toggle('dark', this.state.theme === 'dark'); 
+            this.elements.themeIconDark.classList.toggle('hidden', this.state.theme !== 'dark'); 
+            this.elements.themeIconLight.classList.toggle('hidden', this.state.theme === 'dark'); 
+            if (this.pageModules.graphing && this.pageModules.graphing.isInitialized) {
+                 this.pageModules.graphing.handleThemeChange();
+            }
+        }
+        
+        toggleTheme() { 
+            this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark'; 
+            this.applyTheme(); this.saveState(); 
+        }
+
+        toggleLanguage() {
+            this.state.language = this.state.language === 'en' ? 'si' : 'en';
+            this.applyLanguage();
+            this.saveState();
+        }
+
+        applyLanguage() {
+            this.renderNav(); 
+            this.updateActiveNav();
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                const key = el.dataset.langKey;
+                const text = T(key, this.state.language, this.translations);
+                if (el.matches('input[placeholder], textarea[placeholder]')) el.placeholder = text;
+                else if (el.title) el.title = text;
+                else el.textContent = text;
+            });
+        }
+        
+        showHelpModal() {
+            const pageKey = this.state.currentPage;
+            const contentSource = document.querySelector(`#help-content-sources [data-page="${pageKey}"]`);
+            
+            if (contentSource) {
+                this.elements.helpModalTitle.innerHTML = T(this.pages[pageKey].titleKey, this.state.language, this.translations);
+                this.elements.helpModalContent.innerHTML = contentSource.innerHTML;
+                this.applyLanguage(); // Translate the newly injected modal content
+                this.elements.helpModal.classList.add('visible');
+            }
+        }
+        
+        hideHelpModal() {
+            this.elements.helpModal.classList.remove('visible');
+        }
+
+        getTranslations() {
+            return {
+                en: {
+                    // Nav
+                    nav_graphing: "Graphing Lab", nav_calculator: "Symbolic Calc", nav_matrix: "Matrices", nav_practice: "Practice", nav_converter: "Converter", nav_library: "Library",
+                    // Sidebar
+                    sidebar_help: "Help", sidebar_language: "Language", sidebar_theme: "Toggle Theme",
+                    // Calculator Page
+                    calc_title: "Symbolic Calculator", calc_expr_label: "Enter Expression or Equation", calc_op_label: "Select Operation",
+                    calc_op_eval: "Evaluate", calc_op_simplify: "Simplify", calc_op_deriv: "Derivative (w.r.t x)", calc_op_integral: "Integral (w.r.t x)", calc_op_solve: "Solve Equation for x",
+                    calc_calc_btn: "Calculate", calc_result_title: "Result", calc_history_title: "History", calc_clear_btn: "Clear", calc_history_empty: "No history yet.",
+                    // Matrix Page
+                    matrix_title: "Matrix Calculator", matrix_a_label: "Matrix A (e.g., [[1, 2], [3, 4]])", matrix_b_label: "Matrix B (for binary operations)",
+                    matrix_op_label: "Operation", matrix_op_det: "Determinant (A)", matrix_op_inv: "Inverse (A)", matrix_op_transpose: "Transpose (A)", matrix_op_eigen: "Eigenvalues (A)", matrix_op_multiply: "Multiply (A * B)",
+                    matrix_calc_btn: "Calculate", matrix_result_title: "Result:",
+                    // Graphing Page
+                    graphing_title: "Interactive Canvas & Analysis Engine", graphing_subtitle: "Visualize, Analyze, and Interact with Mathematical Functions", graphing_upload_export_tooltip: "Upload / Export", graphing_share_tooltip: "Copy Share Link", graphing_reset_tooltip: "Reset All",
+                    graphing_eq_title: "Equations", graphing_presets: "Load Preset...", graphing_target_fn_label: "Target for Analysis", graphing_no_fn_option: "No equations available",
+                    graphing_tab_analysis: "Analysis", graphing_tab_apps: "Applications", graphing_show_tangent_label: "Show Tangent Line", graphing_crit_pts_label: "Show Critical Points", graphing_intersections_label: "Show Intersections",
+                    graphing_show_derivative_plot_label: "Plot Derivative", graphing_integral_title: "Definite Integral", graphing_show_area_label: "Show Area Under Curve", graphing_lower_bound_label: "Lower Bound (a)",
+                    graphing_upper_bound_label: "Upper Bound (b)", graphing_integral_info_placeholder: "Area calculation appears here", graphing_view_settings_title: "View Settings", graphing_autofit_btn: "Auto-Fit View",
+                    graphing_grid_label: "Grid", graphing_axes_label: "Axes", graphing_reset_view_tooltip: "Reset View", graphing_fn_placeholder: "Enter expression...", graphing_newton_method_title: "Newton's Method",
+                    graphing_show_newton_label: "Visualize Newton's Method", graphing_newton_start_label: "Starting point x₀",
+                    // Practice Page
+                    practice_title: "Practice Lab", practice_topic_label: "Select Topic", practice_topic_deriv: "Derivatives", practice_topic_integral: "Integrals",
+                    practice_answer_placeholder: "Your Answer...", practice_check_btn: "Check Answer", practice_next_btn: "Next Problem",
+                    practice_feedback_correct: "Correct!", practice_feedback_incorrect: "Incorrect. The correct answer is:",
+                    // Converter Page
+                    converter_title: "Unit Converter", converter_value_label: "Value", converter_from_label: "From", converter_to_label: "To", converter_result_title: "Result:",
+                    // Library Page
+                    library_title: "Formula & Theorem Library", library_deriv_title: "Common Derivatives", library_integral_title: "Common Integrals", library_theorems_title: "Key Theorems",
+                    library_ftc_title: "Fundamental Theorem of Calculus", library_ftc_desc: "If f is continuous on [a, b] and F'(x) = f(x), then ∫ₐᵇ f(x) dx = F(b) - F(a).",
+                    // Help Modals Content
+                    help_graphing_title_1: "Getting Started: Plotting Your First Function", help_graphing_p_1: "Welcome to the interactive graphing laboratory! Getting your ideas onto the canvas is simple:",
+                    help_graphing_li_1: "<strong>Direct Input:</strong> The easiest way is to type your mathematical expression directly into an input box under the \"Equations\" panel. For example, to plot a parabola, simply type <code>x^2</code>. The graph will update automatically as you type.",
+                    help_graphing_li_2: "<strong>Adding More Graphs:</strong> Click the large blue \"+\" button to add a new function to the canvas. You can plot multiple functions simultaneously to compare their behaviors.",
+                    help_graphing_li_3: "<strong>Changing Function Type:</strong> Each function can be Cartesian (y=f(x)), Parametric, or Polar. Click the 'C', 'P', or 'R' buttons on any function card to switch its type and reveal the appropriate input fields.",
+                    help_graphing_li_4: "<strong>Loading Presets:</strong> Don't know what to plot? Use the \"Load Preset...\" dropdown to explore interesting and classic curves like the Cycloid, Cardioid, or Bell Curve.",
+                    help_graphing_title_2: "Interactive Analysis", help_graphing_p_2: "This tool is more than just a plotter. Use the \"Analysis\" and \"Applications\" tabs to explore calculus concepts visually:",
+                    help_graphing_li_5: "<strong>Tangent Line:</strong> Select a target function, enable \"Show Tangent Line\", and move your mouse over the graph to see the live tangent and its properties.",
+                    help_graphing_li_6: "<strong>Critical Points & Intersections:</strong> Toggle switches to automatically find and plot local maxima/minima and the points where different graphs cross.",
+                    help_graphing_li_7: "<strong>Definite Integrals:</strong> Switch to the \"Applications\" tab to visualize the area under a curve between two bounds, `a` and `b`. The calculated area is updated in real-time.",
+                    help_calc_title_1: "Using the Symbolic Calculator", help_calc_p_1: "This tool performs symbolic math operations. Enter a mathematical expression and choose an operation from the dropdown menu.",
+                    help_calc_li_1: "<strong>Evaluate:</strong> Computes the numerical result of an expression. E.g., <code>2 * (3 + 4)</code> results in <code>14</code>.",
+                    help_calc_li_2: "<strong>Simplify:</strong> Simplifies algebraic expressions. E.g., <code>x + x + y</code> simplifies to <code>2x + y</code>.",
+                    help_calc_li_3: "<strong>Derivative:</strong> Finds the derivative of an expression with respect to `x`. E.g., <code>x^2</code> results in <code>2x</code>.",
+                    help_calc_li_4: "<strong>Integral:</strong> Finds the indefinite integral with respect to `x`. E.g., <code>2x</code> results in <code>x^2 + C</code>.",
+                    help_calc_li_5: "<strong>Solve:</strong> Solves an equation for `x`. E.g., <code>2x - 4 = 0</code> results in <code>x = 2</code>.",
+                    help_calc_p_2: "Your calculations are automatically saved in the History panel. You can click any history item to load it back into the calculator.",
+                    help_matrix_title_1: "Working with Matrices", help_matrix_p_1: "The Matrix Calculator uses a specific format for input. Matrices must be entered as nested arrays inside square brackets.",
+                    help_matrix_li_1: "<strong>Example Format:</strong> A 2x2 matrix like <code>[[a, b], [c, d]]</code> should be typed as <code>[[1, 2], [3, 4]]</code>.",
+                    help_matrix_li_2: "<strong>Matrix A</strong> is used for all operations.",
+                    help_matrix_li_3: "<strong>Matrix B</strong> is only used for binary operations like multiplication.",
+                    help_matrix_p_2: "Select the desired operation from the dropdown and click \"Calculate\". The result will be formatted and displayed below.",
+                    help_practice_title_1: "Practice Your Skills", help_practice_p_1: "The Practice Lab generates random problems for you to solve, helping you sharpen your calculus skills.",
+                    help_practice_li_1: "1. Select a topic (e.g., Derivatives).", help_practice_li_2: "2. The tool will display a problem.",
+                    help_practice_li_3: "3. Type your answer into the input field. Make sure to use correct mathematical syntax (e.g., <code>4*x^3</code> for 4x³).",
+                    help_practice_li_4: "4. Click \"Check Answer\" to get immediate feedback.", help_practice_li_5: "5. Click \"Next Problem\" for a new challenge.",
+                    help_converter_title_1: "How to Use the Unit Converter", help_converter_p_1: "This tool allows for quick conversion between various units of measurement.",
+                    help_converter_li_1: "1. Enter the numerical value you wish to convert in the \"Value\" field.",
+                    help_converter_li_2: "2. Select the starting unit from the \"From\" dropdown.", help_converter_li_3: "3. Select the target unit from the \"To\" dropdown.",
+                    help_converter_p_2: "The result is calculated and displayed automatically. The dropdowns are grouped by measurement type (e.g., Length, Mass) for easy navigation.",
+                    help_library_title_1: "Formula & Theorem Library", help_library_p_1: "This section serves as a quick reference for some of the most common formulas and important theorems in introductory calculus.",
+                    help_library_p_2: "It is not interactive, but provides a handy cheat-sheet if you need to quickly recall a specific rule or theorem while working in the other tools.",
+                },
+                si: {
+                    // Nav
+                    nav_graphing: "ප්‍රස්තාර විද්‍යාගාරය", nav_calculator: "සංකේතාත්මක ගණකය", nav_matrix: "න්‍යාස", nav_practice: "පුහුණු වන්න", nav_converter: "ඒකක ಪರಿවර්තකය", nav_library: "පුස්තකාලය",
+                    // Sidebar
+                    sidebar_help: "උදව්", sidebar_language: "භාෂාව", sidebar_theme: "තේමාව මාරු කරන්න",
+                    // Calculator Page
+                    calc_title: "සංකේතාත්මක ගණකය", calc_expr_label: "ප්‍රකාශනය හෝ සමීකරණය ඇතුළත් කරන්න", calc_op_label: "මෙහෙයුම තෝරන්න",
+                    calc_op_eval: "අගයන්න", calc_op_simplify: "සුළු කරන්න", calc_op_deriv: "ව්‍යුත්පන්නය (x ට සාපේක්ෂව)", calc_op_integral: "අනුකලය (x ට සාපේක්ෂව)", calc_op_solve: "x සඳහා සමීකරණය විසඳන්න",
+                    calc_calc_btn: "ගණනය කරන්න", calc_result_title: "ප්‍රතිඵලය", calc_history_title: "ඉතිහාසය", calc_clear_btn: "මකන්න", calc_history_empty: "තවම ඉතිහාසයක් නොමැත.",
+                    // Matrix Page
+                    matrix_title: "න්‍යාස ගණකය", matrix_a_label: "න්‍යාස A (උදා: [[1, 2], [3, 4]])", matrix_b_label: "න්‍යාස B (ද්විමය මෙහෙයුම් සඳහා)",
+                    matrix_op_label: "මෙහෙයුම", matrix_op_det: "නිර්ණායකය (A)", matrix_op_inv: "ප්‍රතිලෝමය (A)", matrix_op_transpose: "ස්ථාන මාරුව (A)", matrix_op_eigen: "අයිගන් අගයන් (A)", matrix_op_multiply: "ගුණ කිරීම (A * B)",
+                    matrix_calc_btn: "ගණනය කරන්න", matrix_result_title: "ප්‍රතිඵලය:",
+                    // Graphing Page
+                    graphing_title: "අන්තර්ක්‍රියාකාරී කැන්වස් සහ විශ්ලේෂණ එන්ජිම", graphing_subtitle: "ගණිතමය ශ්‍රිත දෘශ්‍යමාන කරන්න, විශ්ලේෂණය කරන්න, සහ අන්තර්ක්‍රියා කරන්න", graphing_upload_export_tooltip: "උඩුගත / අපනයන", graphing_share_tooltip: "හුවමාරු සබැඳිය පිටපත් කරන්න", graphing_reset_tooltip: "සියල්ල යළි පිහිටුවන්න",
+                    graphing_eq_title: "සමීකරණ", graphing_presets: "සැකසුමක් තෝරන්න...", graphing_target_fn_label: "විශ්ලේෂණය සඳහා ඉලක්කය", graphing_no_fn_option: "සමීකරණ නොමැත",
+                    graphing_tab_analysis: "විශ්ලේෂණය", graphing_tab_apps: "යෙදුම්", graphing_show_tangent_label: "ස්පර්ශක රේඛාව පෙන්වන්න", graphing_crit_pts_label: "අවධි ලක්ෂ්‍ය පෙන්වන්න", graphing_intersections_label: "ඡේදන ලක්ෂ්‍ය පෙන්වන්න",
+                    graphing_show_derivative_plot_label: "ව්‍යුත්පන්නය අඳින්න", graphing_integral_title: "නිශ්චිත අනුකලය", graphing_show_area_label: "වක්‍රය යට වර්ගඵලය පෙන්වන්න", graphing_lower_bound_label: "පහළ සීමාව (a)",
+                    graphing_upper_bound_label: "ඉහළ සීමාව (b)", graphing_integral_info_placeholder: "වර්ගඵලය මෙතැන දිස්වනු ඇත", graphing_view_settings_title: "දර්ශන සැකසුම්", graphing_autofit_btn: "දර්ශනය ස්වයංක්‍රීයව සකසන්න",
+                    graphing_grid_label: "දැලිස", graphing_axes_label: "අක්ෂ", graphing_reset_view_tooltip: "දර්ශනය යළි පිහිටුවන්න", graphing_fn_placeholder: "ප්‍රකාශනය ඇතුලත් කරන්න...", graphing_newton_method_title: "නිව්ටන්ගේ ක්‍රමය",
+                    graphing_show_newton_label: "නිව්ටන්ගේ ක්‍රමය දෘශ්‍යමාන කරන්න", graphing_newton_start_label: "ආරම්භක ලක්ෂ්‍යය x₀",
+                    // Practice Page
+                    practice_title: "පුහුණු විද්‍යාගාරය", practice_topic_label: "මාතෘකාව තෝරන්න", practice_topic_deriv: "ව්‍යුත්පන්න", practice_topic_integral: "අනුකල",
+                    practice_answer_placeholder: "ඔබේ පිළිතුර...", practice_check_btn: "පිළිතුර පරීක්ෂා කරන්න", practice_next_btn: "ඊළඟ ගැටලුව",
+                    practice_feedback_correct: "නිවැරදියි!", practice_feedback_incorrect: "වැරදියි. නිවැරදි පිළිතුර:",
+                    // Converter Page
+                    converter_title: "ඒකක ಪರಿවර්තකය", converter_value_label: "අගය", converter_from_label: "සිට", converter_to_label: "වෙත", converter_result_title: "ප්‍රතිඵලය:",
+                    // Library Page
+                    library_title: "සූත්‍ර සහ ප්‍රමේය පුස්තකාලය", library_deriv_title: "පොදු ව්‍යුත්පන්න", library_integral_title: "පොදු අනුකල", library_theorems_title: "ප්‍රධාන ප්‍රමේය",
+                    library_ftc_title: "කලනයේ මූලික ප්‍රමේය", library_ftc_desc: "f ශ්‍රිතය [a, b] මත සන්තතික නම් සහ F'(x) = f(x) නම්, ∫ₐᵇ f(x) dx = F(b) - F(a) වේ.",
+                    // Help Modals Content
+                    help_graphing_title_1: "ආරම්භ කිරීම: ඔබේ පළමු ශ්‍රිතය ඇඳීම", help_graphing_p_1: "අන්තර්ක්‍රියාකාරී ප්‍රස්තාර විද්‍යාගාරයට සාදරයෙන් පිළිගනිමු! කැන්වසය මත ඔබේ අදහස් ඇඳීම සරලයි:",
+                    help_graphing_li_1: "<strong>සෘජු ආදානය:</strong> පහසුම ක්‍රමය වන්නේ \"සමීකරණ\" පැනලය යටතේ ඇති ආදාන කොටුවේ ඔබේ ගණිතමය ප්‍රකාශනය ටයිප් කිරීමයි. උදාහරණයක් ලෙස, පරාවලයක් ඇඳීමට, <code>x^2</code> ලෙස ටයිප් කරන්න. ඔබ ටයිප් කරන විට ප්‍රස්තාරය ස්වයංක්‍රීයව යාවත්කාලීන වේ.",
+                    help_graphing_li_2: "<strong>තවත් ප්‍රස්තාර එකතු කිරීම:</strong> කැන්වසයට නව ශ්‍රිතයක් එක් කිරීමට විශාල නිල් \"+\" බොත්තම ක්ලික් කරන්න. ඒවායේ හැසිරීම් සංසන්දනය කිරීම සඳහා ඔබට එකවර ශ්‍රිත කිහිපයක් ඇඳිය හැකිය.",
+                    help_graphing_li_3: "<strong>ශ්‍රිත වර්ගය වෙනස් කිරීම:</strong> සෑම ශ්‍රිතයක්ම කාටීසියානු (y=f(x)), පරාමිතික, හෝ ධ්‍රැවීය විය හැකිය. එහි වර්ගය මාරු කිරීමට සහ සුදුසු ආදාන ක්ෂේත්‍ර හෙළි කිරීමට ඕනෑම ශ්‍රිත කාඩ්පතක 'C', 'P', හෝ 'R' බොත්තම් ක්ලික් කරන්න.",
+                    help_graphing_li_4: "<strong>සැකසුම් පැටවීම:</strong> කුමක් ඇඳිය යුතු දැයි නොදන්නේද? Cycloid, Cardioid, හෝ Bell Curve වැනි රසවත් සහ සම්භාව්‍ය වක්‍ර ගවේෂණය කිරීමට \"සැකසුමක් තෝරන්න...\" ಡ್ರಾಪ್ಡೌන් භාවිතා කරන්න.",
+                    help_graphing_title_2: "අන්තර්ක්‍රියාකාරී විශ්ලේෂණය", help_graphing_p_2: "මෙම මෙවලම ප්‍රස්තාර අඳින්නෙකුට වඩා වැඩි ය. කලන සංකල්ප දෘශ්‍යමය වශයෙන් ගවේෂණය කිරීමට \"විශ්ලේෂණය\" සහ \"යෙදුම්\" ටැබ් භාවිතා කරන්න:",
+                    help_graphing_li_5: "<strong>ස්පර්ශක රේඛාව:</strong> ඉලක්කගත ශ්‍රිතයක් තෝරා, \"ස්පර්ශක රේඛාව පෙන්වන්න\" සක්‍රීය කර, සජීවී ස්පර්ශකය සහ එහි ගුණාංග බැලීමට ප්‍රස්තාරය මත ඔබේ මූසිකය ගෙන යන්න.",
+                    help_graphing_li_6: "<strong>අවධි ලක්ෂ්‍ය සහ ඡේදන:</strong> දේශීය උපරිම/අවම සහ විවිධ ප්‍රස්තාර ඡේදනය වන ලක්ෂ්‍ය ස්වයංක්‍රීයව සොයා ගැනීමට සහ ඇඳීමට ටොගල ස්විච භාවිතා කරන්න.",
+                    help_graphing_li_7: "<strong>නිශ්චිත අනුකල:</strong> සීමා දෙකක්, `a` සහ `b` අතර වක්‍රයක් යටතේ ඇති වර්ගඵලය දෘශ්‍යමාන කිරීමට \"යෙදුම්\" ටැබයට මාරු වන්න. ගණනය කළ වර්ගඵලය තත්‍ය කාලීනව යාවත්කාලීන වේ.",
+                    help_calc_title_1: "සංකේතාත්මක ගණකය භාවිතා කිරීම", help_calc_p_1: "මෙම මෙවලම සංකේතාත්මක ගණිත මෙහෙයුම් සිදු කරයි. ගණිතමය ප්‍රකාශනයක් ඇතුළත් කර පතන මෙනුවෙන් මෙහෙයුමක් තෝරන්න.",
+                    help_calc_li_1: "<strong>අගයන්න:</strong> ප්‍රකාශනයක සංඛ්‍යාත්මක ප්‍රතිඵලය ගණනය කරයි. උදා: <code>2 * (3 + 4)</code> ප්‍රතිඵලය <code>14</code>.",
+                    help_calc_li_2: "<strong>සුළු කරන්න:</strong> වීජීය ප්‍රකාශන සරල කරයි. උදා: <code>x + x + y</code> සරලව <code>2x + y</code> වේ.",
+                    help_calc_li_3: "<strong>ව්‍යුත්පන්නය:</strong> `x` ට සාපේක්ෂව ප්‍රකාශනයක ව්‍යුත්පන්නය සොයයි. උදා: <code>x^2</code> ප්‍රතිඵලය <code>2x</code>.",
+                    help_calc_li_4: "<strong>අනුකලය:</strong> `x` ට සාපේක්ෂව അനിശ്ചിത අනුකලය සොයයි. උදා: <code>2x</code> ප්‍රතිඵලය <code>x^2 + C</code>.",
+                    help_calc_li_5: "<strong>විසඳන්න:</strong> `x` සඳහා සමීකරණයක් විසඳයි. උදා: <code>2x - 4 = 0</code> ප්‍රතිඵලය <code>x = 2</code>.",
+                    help_calc_p_2: "ඔබගේ ගණනය කිරීම් ඉතිහාස පැනලයේ ස්වයංක්‍රීයව සුරැකේ. ගණකයට එය නැවත පූරණය කිරීමට ඕනෑම ඉතිහාස අයිතමයක් ක්ලික් කළ හැකිය.",
+                    help_matrix_title_1: "න්‍යාස සමඟ වැඩ කිරීම", help_matrix_p_1: "න්‍යාස ගණකය ආදානය සඳහා නිශ්චිත ආකෘතියක් භාවිතා කරයි. න්‍යාස හතරැස් වරහන් තුළ කැදලි අරා ලෙස ඇතුළත් කළ යුතුය.",
+                    help_matrix_li_1: "<strong>උදාහරණ ආකෘතිය:</strong> <code>[[a, b], [c, d]]</code> වැනි 2x2 න්‍යාසයක් <code>[[1, 2], [3, 4]]</code> ලෙස ටයිප් කළ යුතුය.",
+                    help_matrix_li_2: "<strong>න්‍යාස A</strong> සියලුම මෙහෙයුම් සඳහා භාවිතා වේ.",
+                    help_matrix_li_3: "<strong>න්‍යාස B</strong> ගුණ කිරීම වැනි ද්විමය මෙහෙයුම් සඳහා පමණක් භාවිතා වේ.",
+                    help_matrix_p_2: "පතන මෙනුවෙන් අවශ්‍ය මෙහෙයුම තෝරා \"ගණනය කරන්න\" ක්ලික් කරන්න. ප්‍රතිඵලය ආකෘතිකරණය කර පහත දැක්වේ.",
+                    help_practice_title_1: "ඔබේ කුසලතා පුහුණු වන්න", help_practice_p_1: "පුහුණු විද්‍යාගාරය ඔබට විසඳීම සඳහා සසම්භාවී ගැටළු ජනනය කරයි, ඔබේ කලන කුසලතා මුවහත් කිරීමට උපකාරී වේ.",
+                    help_practice_li_1: "1. මාතෘකාවක් තෝරන්න (උදා: ව්‍යුත්පන්න).", help_practice_li_2: "2. මෙවලම ගැටලුවක් පෙන්වනු ඇත.",
+                    help_practice_li_3: "3. ආදාන ක්ෂේත්‍රයේ ඔබේ පිළිතුර ටයිප් කරන්න. නිවැරදි ගණිතමය වාക്യ ರಚනය භාවිතා කිරීමට වග බලා ගන්න (උදා: 4x³ සඳහා <code>4*x^3</code>).",
+                    help_practice_li_4: "4. ක්ෂණික ප්‍රතිපෝෂණ ලබා ගැනීමට \"පිළිතුර පරීක්ෂා කරන්න\" ක්ලික් කරන්න.", help_practice_li_5: "5. නව අභියෝගයක් සඳහා \"ඊළඟ ගැටලුව\" ක්ලික් කරන්න.",
+                    help_converter_title_1: "ඒකක ಪರಿවර්තකය භාවිතා කරන්නේ කෙසේද", help_converter_p_1: "මෙම මෙවලම විවිධ මිනුම් ඒකක අතර ඉක්මන් පරිවර්තනයකට ඉඩ සලසයි.",
+                    help_converter_li_1: "1. \"අගය\" ක්ෂේත්‍රයේ ඔබ පරිවර්තනය කිරීමට කැමති සංඛ්‍යාත්මක අගය ඇතුළත් කරන්න.",
+                    help_converter_li_2: "2. \"සිට\" පතන මෙනුවෙන් ආරම්භක ඒකකය තෝරන්න.", help_converter_li_3: "3. \"වෙත\" පතන මෙනුවෙන් ඉලක්ක ඒකකය තෝරන්න.",
+                    help_converter_p_2: "ප්‍රතිඵලය ස්වයංක්‍රීයව ගණනය කර දර්ශනය වේ. පහසු සංචාලනය සඳහා පතන මෙනු මිනුම් වර්ගය අනුව (උදා: දිග, ස්කන්ධය) කාණ්ඩ කර ඇත.",
+                    help_library_title_1: "සූත්‍ර සහ ප්‍රමේය පුස්තකාලය", help_library_p_1: "මෙම කොටස හඳුන්වාදීමේ කලනයේ බහුලවම භාවිතා වන සමහර සූත්‍ර සහ වැදගත් ප්‍රමේය සඳහා ඉක්මන් යොමුවක් ලෙස සේවය කරයි.",
+                    help_library_p_2: "එය අන්තර්ක්‍රියාකාරී නොවේ, නමුත් ඔබ වෙනත් මෙවලම්වල වැඩ කරන අතරතුර නිශ්චිත රීතියක් හෝ ප්‍රමේයයක් ඉක්මනින් සිහිපත් කිරීමට අවශ්‍ය නම් එය පහසු වංචා පත්‍රිකාවක් සපයයි.",
+                }
+            };
+        }
+    }
+
+    // --- PAGE-SPECIFIC LOGIC MODULES ---
+    class CalculatorModule {
+        constructor(parentApp) { this.parentApp = parentApp; } 
+        init() { 
+            this.elements = { 
+                calculateBtn: document.getElementById('calculate-btn'), expressionInput: document.getElementById('expression'), 
+                operationSelect: document.getElementById('operation'), resultDiv: document.getElementById('result'), 
+                historyList: document.getElementById('history-list'), clearHistoryBtn: document.getElementById('clear-history-btn'), 
+            }; 
+            this.elements.calculateBtn.addEventListener('click', () => this.calculate()); 
+            this.elements.expressionInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.calculate(); }); 
+            this.elements.clearHistoryBtn.addEventListener('click', () => this.clearHistory()); 
+            this.renderHistory(); 
+        } 
+        calculate() { 
+            const expr = this.elements.expressionInput.value; const op = this.elements.operationSelect.value; if (!expr) return; 
+            let resultText; 
+            try { 
+                switch (op) { 
+                    case 'evaluate': resultText = math.evaluate(expr).toString(); break; 
+                    case 'simplify': resultText = math.simplify(expr).toString(); break; 
+                    case 'derivative': resultText = math.derivative(expr, 'x').toString(); break; 
+                    case 'integral': resultText = math.integral(expr, 'x').toString() + ' + C'; break; 
+                    case 'solve': resultText = math.solve(expr, 'x').map(s => s.toString()).join(', '); break; 
+                } 
+                this.elements.resultDiv.textContent = resultText; 
+                this.addToHistory({ expr, op, result: resultText, ts: new Date().toISOString() }); 
+            } catch (error) { this.elements.resultDiv.textContent = `Error: ${error.message}`; } 
+            // Add flash animation
+            this.elements.resultDiv.classList.remove('animate-result-flash');
+            void this.elements.resultDiv.offsetWidth; // Trigger reflow
+            this.elements.resultDiv.classList.add('animate-result-flash');
+        } 
+        addToHistory(item) { 
+            this.parentApp.state.history.unshift(item); 
+            if (this.parentApp.state.history.length > 20) this.parentApp.state.history.pop(); 
+            this.parentApp.saveState(); this.renderHistory(true); 
+        } 
+        renderHistory(isNew = false) { 
+            if (!this.elements.historyList) return; 
+            const history = this.parentApp.state.history; 
+            if (history.length === 0) { 
+                this.elements.historyList.innerHTML = `<p class="text-sm text-center text-[var(--text-secondary)]" data-lang-key="calc_history_empty">${T('calc_history_empty', this.parentApp.state.language, this.parentApp.translations)}</p>`; return; 
+            } 
+            this.elements.historyList.innerHTML = history.map((item, index) => `<div class="p-3 bg-[var(--bg-tertiary)]/50 rounded-lg cursor-pointer hover:bg-[var(--bg-tertiary)] ${isNew && index === 0 ? 'animate-slide-down-in' : ''}" data-history-index="${index}"><p class="font-mono text-sm truncate text-blue-600 dark:text-blue-400 pointer-events-none">${item.expr}</p><p class="text-xs text-[var(--text-secondary)] pointer-events-none">${item.op} &bull; ${new Date(item.ts).toLocaleTimeString()}</p></div>`).join(''); 
+            this.elements.historyList.querySelectorAll('[data-history-index]').forEach(el => { 
+                el.addEventListener('click', (e) => { 
+                    const index = e.currentTarget.dataset.historyIndex; const item = history[index]; 
+                    this.elements.expressionInput.value = item.expr; 
+                    this.elements.operationSelect.value = item.op; this.calculate(); 
+                }); 
+            }); 
+        } 
+        clearHistory() { this.parentApp.state.history = []; this.parentApp.saveState(); this.renderHistory(); } 
+    }
+    class MatrixModule {
+        init() { this.elements={matrixA:document.getElementById("matrix-a"),matrixB:document.getElementById("matrix-b"),operation:document.getElementById("matrix-operation"),calculateBtn:document.getElementById("matrix-calculate-btn"),resultPre:document.getElementById("matrix-result")}; this.elements.calculateBtn.addEventListener("click",()=>this.calculate()) } calculate() { try{const t=math.evaluate(this.elements.matrixA.value),e=math.evaluate(this.elements.matrixB.value),i=this.elements.operation.value;let s;switch(i){case"det":s=math.det(t);break;case"inv":s=math.inv(t);break;case"transpose":s=math.transpose(t);break;case"eigen":s=math.eigs(t).values;break;case"multiply":s=math.multiply(t,e)}this.elements.resultPre.textContent=math.format(s,{notation:"fixed",precision:4})}catch(o){this.elements.resultPre.textContent="Error: "+o.message} this.elements.resultPre.classList.remove('animate-result-flash'); void this.elements.resultPre.offsetWidth; this.elements.resultPre.classList.add('animate-result-flash'); }
+    }
+    class PracticeModule {
+        constructor(parentApp) { this.parentApp = parentApp; }
+        init() { this.elements = { topicSelect: document.getElementById('problem-topic'), container: document.getElementById('problem-container'), title: document.getElementById('problem-title'), question: document.getElementById('problem-question'), answerInput: document.getElementById('user-answer'), feedback: document.getElementById('feedback'), submitBtn: document.getElementById('submit-answer'), nextBtn: document.getElementById('next-problem'), }; this.elements.topicSelect.addEventListener('change', () => this.loadProblem()); this.elements.nextBtn.addEventListener('click', () => this.loadProblem()); this.elements.submitBtn.addEventListener('click', () => this.checkAnswer()); this.elements.answerInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.checkAnswer(); }); this.loadProblem(); } 
+        loadProblem() {
+            const topic = this.elements.topicSelect.value; 
+            const problemSet = topic === 'derivatives' ? [{ q: "d/dx (x^4)", a: "4*x^3" }, { q: "d/dx (sin(x))", a: "cos(x)" }, { q: "d/dx (e^x)", a: "e^x" }] : [{ q: "∫ 3x^2 dx", a: "x^3" }, { q: "∫ cos(x) dx", "a": "sin(x)" }, { q: "∫ (1/x) dx", a: "ln(x)" }]; 
+            this.currentProblem = problemSet[Math.floor(Math.random() * problemSet.length)]; 
+            this.elements.title.textContent = this.elements.topicSelect.options[this.elements.topicSelect.selectedIndex].text;
+            this.elements.question.textContent = this.currentProblem.q; 
+            this.elements.answerInput.value = ''; 
+            this.elements.feedback.textContent = ''; 
+            this.elements.answerInput.className = 'input-base mt-4';
+        } 
+        checkAnswer() { 
+            const userAnswer = this.elements.answerInput.value.replace(/\s/g, ''); 
+            const correctAnswer = this.currentProblem.a.replace(/\s/g, ''); 
+            
+            this.elements.answerInput.classList.remove('animate-flash-success', 'animate-flash-error', 'animate-shake');
+            this.elements.feedback.classList.remove('animate-scale-in');
+            void this.elements.answerInput.offsetWidth;
+
+            if (userAnswer === correctAnswer) { 
+                this.elements.feedback.innerHTML = `<span class="inline-block">${T('practice_feedback_correct', this.parentApp.state.language, this.parentApp.translations)}</span>`;
+                this.elements.feedback.className = 'mt-4 h-6 text-center font-semibold text-green-500'; 
+                this.elements.answerInput.classList.add('animate-flash-success');
+            } else { 
+                this.elements.feedback.innerHTML = `<span class="inline-block">${T('practice_feedback_incorrect', this.parentApp.state.language, this.parentApp.translations)} <strong>${this.currentProblem.a}</strong></span>`; 
+                this.elements.feedback.className = 'mt-4 h-6 text-center font-semibold text-red-500'; 
+                this.elements.answerInput.classList.add('animate-flash-error', 'animate-shake');
+            }
+            this.elements.feedback.classList.add('animate-scale-in');
+        }
+    }
+    class ConverterModule { 
+        constructor(){this.units={Length:["m","km","cm","mm","mi","yd","ft","in"],Mass:["g","kg","mg","oz","lb"],Time:["s","min","h","day","week"],Angle:["rad","deg"]}} init(){this.elements={input:document.getElementById("unit-input"),from:document.getElementById("unit-from"),to:document.getElementById("unit-to"),result:document.getElementById("unit-result")},this.populateSelects(),this.elements.input.addEventListener("input",()=>this.convert()),this.elements.from.addEventListener("change",()=>this.convert()),this.elements.to.addEventListener("change",()=>this.convert()),this.convert()} populateSelects(){let t="";for(const e in this.units)t+=`<optgroup label="${e}">`,t+=this.units[e].map(t=>`<option value="${t}">${t}</option>`).join(""),t+="</optgroup>";this.elements.from.innerHTML=t,this.elements.to.innerHTML=t,this.elements.from.value="m",this.elements.to.value="ft"} convert(){try{const t=parseFloat(this.elements.input.value);if(isNaN(t))return void(this.elements.result.textContent="...");const e=math.unit(t,this.elements.from.value).to(this.elements.to.value);this.elements.result.textContent=e.format({notation:"fixed",precision:4})}catch(i){this.elements.result.textContent="N/A"} const el=this.elements.result; el.classList.remove("animate-scale-in"); void el.offsetWidth; el.classList.add("animate-scale-in");}
+    }
+
+    // ==================================================================
+    // ===       UPGRADED GRAPHING CALCULATOR MODULE                ===
+    // ==================================================================
+    class GraphingModule {
+        constructor(parentApp) { this.parentApp = parentApp; this.isInitialized = false; this.visualizer = null; }
+        init() {
+            window.graphingModuleInstance = this;
+            this.visualizer = new FullCalculusVisualizer(this.parentApp);
+            this.isInitialized = true;
+            this.parentApp.saveState(); 
+        }
+        getModuleState() { return this.visualizer ? this.visualizer.getState() : null; }
+        handleThemeChange() { if(this.visualizer) this.visualizer.requestDraw(); }
+    }
+    
+    class FullCalculusVisualizer {
+        constructor(parentApp) {
+            this.parentApp = parentApp;
+            this.canvas = document.getElementById('graphCanvas'); this.ctx = this.canvas.getContext('2d');
+            this.functionsListContainer = document.getElementById('functionsList'); this.cursorInfoEl = document.getElementById('cursorInfo');
+            this.tooltipEl = document.getElementById('tooltip'); this.integralInfoEl = document.getElementById('integralInfo');
+            this.defaultState = this.getDefaultState(); this.state = this.loadState(this.parentApp.state.graphingState);
+            this.animationFrameId = null; this.compiledFunctions = new Map();
+            this.analyzedPoints = []; this.debouncedEquationUpdate = this.debounce((funcId) => { const func = this.state.functions.find(f => f.id === funcId); if (func) { this.compileFunction(func); this.analyzeAllPoints(); this.updateUI(); this.requestDraw(); } }, 300);
+            this.setupEventListeners(); this.setupCanvas();
+            this.compileAllFunctions(); this.analyzeAllPoints(); this.updateUI(); this.requestDraw();
+        }
+        getState() { return this.state; }
+        getDefaultState() { return { functions: [{ id: Date.now(), type: 'cartesian', expr: 'x^3/9 - x', color: '#22d3ee', visible: true }], view: { xMin: -10, xMax: 10, yMin: -10, yMax: 10 }, target: { functionId: null }, analysis: { showTangent: true, showCriticalPoints: true, showIntersections: true, showDerivativePlot: false, showNewton: false, newtonX0: 2.5 }, apps: { showIntegral: true, integralA: 0, integralB: 3 }, settings: { showGrid: true, showAxes: true } }; }
+        loadState(initialState) {
+            try { const stateParam = new URLSearchParams(window.location.search).get('state'); if (stateParam) return { ...this.defaultState, ...JSON.parse(atob(stateParam)) }; } catch (error) { console.error("URL state loading failed:", error); }
+            return initialState ? initialState : JSON.parse(JSON.stringify(this.defaultState));
+        }
+        setupCanvas() { const resizeCanvas = () => { const container = this.canvas.parentElement; const rect = container.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1; this.canvas.width = rect.width * dpr; this.canvas.height = rect.height * dpr; this.canvas.style.width = `${rect.width}px`; this.canvas.style.height = `${rect.height}px`; this.ctx.scale(dpr, dpr); this.requestDraw(); }; window.addEventListener('resize', this.debounce(resizeCanvas, 50)); resizeCanvas(); }
+        setupEventListeners() {
+            document.getElementById('uploadExportBtn').addEventListener('click', () => this.exportCanvas());
+            document.getElementById('shareBtn').addEventListener('click', () => this.shareState());
+            document.getElementById('resetBtn').addEventListener('click', () => { if (confirm("Reset all equations and settings?")) this.reset(); });
+            document.getElementById('addFunctionBtn').addEventListener('click', () => this.addFunction());
+            document.getElementById('presetSelect').addEventListener('change', (e) => { if (e.target.value) { this.addFunction(JSON.parse(e.target.value)); e.target.value = ''; } });
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => this.switchTab(btn)));
+            document.getElementById('targetFunction').addEventListener('change', (e) => { this.state.target.functionId = parseInt(e.target.value) || null; this.updateAllCalculusInfo(); this.analyzeAllPoints(); this.requestDraw(); });
+            document.querySelectorAll('.toggle-switch[data-setting]').forEach(toggle => toggle.addEventListener('click', () => this.toggleSetting(toggle.dataset.setting)));
+            ['integralA', 'integralB', 'newtonX0'].forEach(id => document.getElementById(id).addEventListener('input', (e) => { this.handleNumericInput(id, e.target.value); }));
+            ['xMin', 'xMax', 'yMin', 'yMax'].forEach(id => document.getElementById(id).addEventListener('input', (e) => { this.state.view[id] = parseFloat(e.target.value) || this.defaultState.view[id]; this.analyzeAllPoints(); this.requestDraw(); }));
+            document.getElementById('autoFitBtn').addEventListener('click', () => this.autoFitView());
+            document.getElementById('zoomIn').addEventListener('click', () => this.zoom(0.8));
+            document.getElementById('zoomOut').addEventListener('click', () => this.zoom(1.2));
+            document.getElementById('resetView').addEventListener('click', () => this.resetView());
+            this.setupCanvasInteractions();
+            const graphContainer = document.querySelector('#page-graphing');
+            graphContainer.addEventListener('input', () => this.parentApp.saveState());
+            graphContainer.addEventListener('click', (e) => { if (e.target.closest('button, .toggle-switch, .function-type-btn')) this.parentApp.saveState(); });
+        }
+        setupCanvasInteractions() {
+            let isPointerDown = false;
+            let lastPos = { x: 0, y: 0 };
+            let lastPinchDist = 0;
+
+            const getPointerPos = (e) => ({ x: e.clientX, y: e.clientY });
+            const getTouchPos = (e) => ({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+            const getPinchDist = (e) => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            
+            const handlePan = (newPos) => {
+                const rect = this.canvas.getBoundingClientRect();
+                const worldDeltaX = (newPos.x - lastPos.x) * (this.state.view.xMax - this.state.view.xMin) / (rect.width);
+                const worldDeltaY = -(newPos.y - lastPos.y) * (this.state.view.yMax - this.state.view.yMin) / (rect.height);
+                this.state.view.xMin -= worldDeltaX; this.state.view.xMax -= worldDeltaX;
+                this.state.view.yMin -= worldDeltaY; this.state.view.yMax -= worldDeltaY;
+                this.updateViewInputs(); this.analyzeAllPoints(); this.requestDraw();
+                lastPos = newPos;
+            };
+            
+            // Mouse Events
+            this.canvas.addEventListener('mousedown', (e) => { isPointerDown = true; lastPos = getPointerPos(e); this.canvas.style.cursor = 'grabbing'; });
+            this.canvas.addEventListener('mousemove', (e) => {
+                const rect = this.canvas.getBoundingClientRect();
+                const pos = getPointerPos(e);
+                this.lastMouseX = pos.x; this.lastMouseY = pos.y;
+                const worldCoords = { x: this.screenToWorldX(pos.x - rect.left), y: this.screenToWorldY(pos.y - rect.top) };
+                this.cursorInfoEl.textContent = `(${worldCoords.x.toFixed(3)}, ${worldCoords.y.toFixed(3)})`;
+                this.cursorInfoEl.style.opacity = '1';
+                this.updateTooltip(pos.x - rect.left, pos.y - rect.top);
+                this.requestDraw();
+                if (isPointerDown) { handlePan(pos); }
+            });
+            this.canvas.addEventListener('mouseup', () => { isPointerDown = false; this.canvas.style.cursor = 'grab'; });
+            this.canvas.addEventListener('mouseleave', () => { isPointerDown = false; this.lastMouseX = undefined; this.lastMouseY = undefined; this.canvas.style.cursor = 'grab'; this.cursorInfoEl.style.opacity = '0'; this.tooltipEl.style.opacity = '0'; this.requestDraw(); });
+            this.canvas.addEventListener('wheel', (e) => { e.preventDefault(); const rect = this.canvas.getBoundingClientRect(); this.zoom(e.deltaY > 0 ? 1.1 : 0.9, this.screenToWorldX(e.clientX - rect.left), this.screenToWorldY(e.clientY - rect.top)); });
+
+            // Touch Events
+            this.canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isPointerDown = true;
+                if (e.touches.length === 1) {
+                    lastPos = getTouchPos(e);
+                } else if (e.touches.length === 2) {
+                    lastPinchDist = getPinchDist(e);
+                }
+            }, { passive: false });
+
+            this.canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                if (e.touches.length === 1) {
+                    const pos = getTouchPos(e);
+                    handlePan(pos);
+                    this.lastMouseX = pos.x;
+                    this.lastMouseY = pos.y;
+                    this.updateTooltip(pos.x - rect.left, pos.y - rect.top);
+                } else if (e.touches.length === 2) {
+                    const newPinchDist = getPinchDist(e);
+                    const factor = lastPinchDist / newPinchDist;
+                    const pivotScreenX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+                    const pivotScreenY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+                    this.zoom(factor, this.screenToWorldX(pivotScreenX), this.screenToWorldY(pivotScreenY));
+                    lastPinchDist = newPinchDist;
+                }
+            }, { passive: false });
+            
+            this.canvas.addEventListener('touchend', () => {
+                isPointerDown = false;
+                lastPinchDist = 0;
+                this.tooltipEl.style.opacity = '0';
+            });
+        }
+        updateUI() { this.functionsListContainer.innerHTML = this.state.functions.map(f => this.renderFunctionInput(f)).join(''); this.updateTargetFunctionSelect(); this.updateViewInputs(); this.updateAllCalculusInfo(); this.updateAllToggles(); }
+        renderFunctionInput(func) { const compiled = this.compiledFunctions.get(func.id); const hasError = compiled && compiled.error; const typeButtons = ['cartesian', 'parametric', 'polar'].map(type => `<button onclick="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { type: '${type}' })" class="function-type-btn ${func.type === type ? 'active' : ''}">${type.charAt(0).toUpperCase()}</button>`).join(''); let inputFields = ''; const placeholderText = T('graphing_fn_placeholder', this.parentApp.state.language, this.parentApp.translations); const commonInputProps = `class="input-modern flex-1 px-2 py-1 text-sm" placeholder="${placeholderText}"`; switch(func.type) { case 'parametric': inputFields = `<div class="flex items-center gap-2 mb-1"><span class="font-mono text-sm text-text-secondary">x(t)=</span><input type="text" value="${func.xExpr || ''}" oninput="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { xExpr: this.value })" ${commonInputProps}></div><div class="flex items-center gap-2"><span class="font-mono text-sm text-text-secondary">y(t)=</span><input type="text" value="${func.yExpr || ''}" oninput="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { yExpr: this.value })" ${commonInputProps}></div>`; break; case 'polar': inputFields = `<div class="flex items-center gap-2"><span class="font-mono text-sm text-text-secondary">r(θ)=</span><input type="text" value="${func.expr || ''}" oninput="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { expr: this.value })" ${commonInputProps}></div>`; break; default: inputFields = `<div class="flex items-center gap-2"><span class="font-mono text-sm text-text-secondary">y(x)=</span><input type="text" value="${func.expr || ''}" oninput="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { expr: this.value })" ${commonInputProps}></div>`; } const visibilityIcon = func.visible ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.018 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zM9 4.804A7.94 7.94 0 0110 4.5c3.51 0 6.463 2.003 7.643 5.5a7.94 7.94 0 01-1.07 2.473l-2.024-2.024a3.988 3.988 0 00-4.874-4.874L9 4.804zM4.318 6.031A7.963 7.963 0 002.357 10c1.274 4.057 5.018 7 9.542 7a8.97 8.97 0 004.14-.986L13.14 12.86a2 2 0 01-2.828-2.828L7.14 7.14 4.318 6.03z" clip-rule="evenodd" /></svg>`; const trashIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>`; return `<div class="dark-panel p-3 rounded-md space-y-2 border-l-4 animate-slide-down-in" style="border-left-color: ${func.color};"><div class="flex items-center justify-between"><div class="flex items-center gap-1">${typeButtons}</div><div class="flex items-center"><input type="color" value="${func.color}" oninput="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { color: this.value })" class="w-8 h-8 bg-transparent border-0 cursor-pointer"><button onclick="window.graphingModuleInstance.visualizer.updateFunction(${func.id}, { visible: ${!func.visible} })" class="btn btn-secondary !bg-transparent !p-2">${visibilityIcon}</button><button onclick="window.graphingModuleInstance.visualizer.removeFunction(${func.id})" class="btn btn-secondary !bg-transparent text-error !p-2">${trashIcon}</button></div></div><div class="space-y-2">${inputFields}</div>${hasError ? `<div class="text-error text-xs mt-1 p-1">${hasError}</div>` : ''}</div>`; }
+        updateTargetFunctionSelect() { const selectF = document.getElementById('targetFunction'); selectF.innerHTML = ''; const availableFunctions = this.state.functions.filter(f => f.visible); if (availableFunctions.length === 0) { selectF.innerHTML = `<option disabled>${T('graphing_no_fn_option', this.parentApp.state.language, this.parentApp.translations)}</option>`; this.state.target.functionId = null; return; } availableFunctions.forEach(func => { const optionF = document.createElement('option'); optionF.value = func.id; let name = func.expr || `${func.xExpr || ''}, ${func.yExpr || ''}`; if (name.length > 30) name = name.substring(0, 27) + "..."; optionF.textContent = name; optionF.selected = func.id === this.state.target.functionId; selectF.appendChild(optionF); }); if (!this.state.target.functionId || !availableFunctions.some(f => f.id === this.state.target.functionId)) { this.state.target.functionId = availableFunctions[0]?.id || null; if (selectF.options.length > 0) selectF.value = this.state.target.functionId; } }
+        updateViewInputs() { ['xMin', 'xMax', 'yMin', 'yMax'].forEach(id => { document.getElementById(id).value = this.state.view[id].toFixed(2); }); }
+        updateAllToggles() { document.querySelectorAll('.toggle-switch[data-setting]').forEach(toggle => { const setting = toggle.dataset.setting; let isActive = false; if (this.state.analysis.hasOwnProperty(setting)) isActive = this.state.analysis[setting]; else if (this.state.apps.hasOwnProperty(setting)) isActive = this.state.apps[setting]; else if (this.state.settings.hasOwnProperty(setting)) isActive = this.state.settings[setting]; toggle.classList.toggle('active', isActive); }); }
+        switchTab(btn) { if (btn.classList.contains('tab-active')) return; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); btn.classList.add('tab-active'); document.querySelectorAll('#analysisTab, #appsTab').forEach(c => c.classList.add('hidden')); document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden'); }
+        handleNumericInput(id, value) { const val = parseFloat(value); if (id === 'integralA' || id === 'integralB') { this.state.apps[id] = isNaN(val) ? 0 : val; } else if (id === 'newtonX0') { this.state.analysis[id] = isNaN(val) ? 0 : val; } this.updateAllCalculusInfo(); this.requestDraw(); }
+        addFunction(config = {}) { const defaults = { type: 'cartesian', expr: 'x^2', xExpr: 'cos(t)', yExpr: 'sin(t)', visible: true, }; const newFunc = { id: Date.now(), color: ['#22d3ee', '#c084fc', '#4ade80', '#facc15', '#f87171', '#60a5fa'][this.state.functions.length % 6], ...defaults, ...config }; this.state.functions.push(newFunc); this.compileAllFunctions(); this.analyzeAllPoints(); this.updateUI(); this.requestDraw(); }
+        removeFunction(id) { this.state.functions = this.state.functions.filter(f => f.id !== id); if (this.state.target.functionId === id) this.state.target.functionId = null; this.compileAllFunctions(); this.analyzeAllPoints(); this.updateUI(); this.requestDraw(); }
+        updateFunction(id, props) { const func = this.state.functions.find(f => f.id === id); if (!func) return; Object.assign(func, props); const isEquationChange = props.hasOwnProperty('expr') || props.hasOwnProperty('xExpr') || props.hasOwnProperty('yExpr'); if (isEquationChange) { this.debouncedEquationUpdate(id); } else { if (props.hasOwnProperty('type')) { this.compileFunction(func); } this.analyzeAllPoints(); this.updateUI(); this.requestDraw(); } }
+        compileAllFunctions() { this.state.functions.forEach(f => this.compileFunction(f)); }
+        compileFunction(func) { try { const compiled = { error: null, original: {} }; switch (func.type) { case 'parametric': compiled.original.x = math.parse(func.xExpr || 't').compile(); compiled.original.y = math.parse(func.yExpr || 't').compile(); compiled.derivative = { x: math.derivative(func.xExpr || 't', 't').compile(), y: math.derivative(func.yExpr || 't', 't').compile(), }; break; case 'polar': compiled.original.r = math.parse(func.expr || '1').compile(); break; default: const node = math.parse(func.expr || '0'); compiled.original.y = node.compile(); compiled.derivative = math.derivative(node, 'x').compile(); break; } this.compiledFunctions.set(func.id, compiled); } catch (error) { this.compiledFunctions.set(func.id, { error: error.message }); } }
+        updateAllCalculusInfo() { const func = this.state.functions.find(f => f.id === this.state.target.functionId); const compiled = func ? this.compiledFunctions.get(func.id) : null; if (!compiled || compiled.error || func.type !== 'cartesian') { this.integralInfoEl.innerHTML = `<span class='text-text-secondary'>${T('graphing_integral_info_placeholder', this.parentApp.state.language, this.parentApp.translations)}</span>`; } else { try { const { integralA: a, integralB: b } = this.state.apps; const area = this.calculateIntegral(compiled.original.y, a, b); this.integralInfoEl.innerHTML = `∫[${a}, ${b}] f(x)dx ≈ <strong>${area.toFixed(4)}</strong>`; } catch (e) { this.integralInfoEl.innerHTML = `<span class='text-error'>Error</span>`; } } }
+        analyzeAllPoints() { this.analyzedPoints = []; if (this.state.analysis.showCriticalPoints) { this.state.functions.forEach(f => { if (f.visible && f.type === 'cartesian') { const roots = this.findRoots(f.id, true); roots.forEach(r => this.analyzedPoints.push({ ...r, type: 'Critical', color: this.getColor('--warning') })); } }); } if (this.state.analysis.showIntersections) { const visible = this.state.functions.filter(f => f.visible && f.type === 'cartesian'); for (let i = 0; i < visible.length; i++) { for (let j = i + 1; j < visible.length; j++) { const intersections = this.findIntersections(visible[i].id, visible[j].id); intersections.forEach(p => this.analyzedPoints.push({ ...p, type: 'Intersection', color: this.getColor('--pink') })); } } } }
+        calculateIntegral(compiledFn, a, b, steps = 1000) { let sum = 0; const min = Math.min(a, b), max = Math.max(a, b), dx = (max - min) / steps; for (let i = 0; i < steps; i++) { try { const val = compiledFn.evaluate({ x: min + (i + 0.5) * dx }); if(isFinite(val)) sum += val; } catch (e) {} } return sum * dx * (a > b ? -1 : 1); }
+        findRoots(funcId, forDerivative = false, steps = 2000) { const compiled = this.compiledFunctions.get(funcId); if (!compiled || compiled.error) return []; const fnToSolve = forDerivative ? compiled.derivative : compiled.original.y; if (!fnToSolve) return []; const points = [], { xMin, xMax } = this.state.view, step = (xMax - xMin) / steps; let y_prev; try { y_prev = fnToSolve.evaluate({x: xMin}); } catch(e) { y_prev = NaN; } for (let x = xMin + step; x <= xMax; x += step) { try { const y_curr = fnToSolve.evaluate({x}); if (y_prev * y_curr < 0 && isFinite(y_prev) && isFinite(y_curr)) { const root_x = this.bisection(fnToSolve, x - step, x); const root_y = compiled.original.y.evaluate({x: root_x}); if (isFinite(root_y)) points.push({ x: root_x, y: root_y }); } y_prev = y_curr; } catch (error) { y_prev = NaN; } } return points; }
+        findIntersections(id1, id2, steps=2000) { const comp1 = this.compiledFunctions.get(id1); const comp2 = this.compiledFunctions.get(id2); if (!comp1 || comp1.error || !comp2 || comp2.error) return []; const diffFunc = { evaluate: (scope) => comp1.original.y.evaluate(scope) - comp2.original.y.evaluate(scope) }; const points = [], { xMin, xMax } = this.state.view, step = (xMax - xMin) / steps; let y_prev; try { y_prev = diffFunc.evaluate({x: xMin}); } catch(e) { y_prev = NaN; } for (let x = xMin + step; x <= xMax; x += step) { try { const y_curr = diffFunc.evaluate({x}); if (y_prev * y_curr < 0 && isFinite(y_prev) && isFinite(y_curr)) { const root_x = this.bisection(diffFunc, x - step, x); const root_y = comp1.original.y.evaluate({x: root_x}); if (isFinite(root_y)) points.push({ x: root_x, y: root_y }); } y_prev = y_curr; } catch (error) { y_prev = NaN; } } return points; }
+        bisection(fn, a, b, tol=1e-6, maxIter=20) { let fa; try { fa = fn.evaluate({x: a}); } catch (e) { return (a+b)/2; } for (let i=0; i < maxIter; i++) { try { const p = a + (b - a) / 2; const fp = fn.evaluate({x: p}); if (fp === 0 || (b - a) / 2 < tol) return p; (fa * fp > 0) ? a = p : b = p; } catch(e) { break; } } return a + (b - a) / 2; }
+        requestDraw() { if (!this.animationFrameId) { this.animationFrameId = requestAnimationFrame(() => this.draw()); } }
+        draw() { this.animationFrameId = null; if (!this.ctx) return; const { width, height } = this.canvas; const dpr = window.devicePixelRatio || 1; const logicalWidth = width/dpr; const logicalHeight = height/dpr; this.ctx.clearRect(0, 0, logicalWidth, logicalHeight); this.ctx.fillStyle = this.getColor('--bg-panel'); this.ctx.fillRect(0, 0, logicalWidth, logicalHeight); if (this.state.settings.showGrid) this.drawGrid(); if (this.state.settings.showAxes) this.drawAxes(); this.state.functions.forEach(func => { if (func.visible) this.drawFunction(func); }); this.drawCalculusFeatures(); this.drawAnalyzedPoints(); }
+        drawGrid() { const ctx = this.ctx; ctx.strokeStyle = this.getColor('--border-color'); ctx.lineWidth = 0.5; const stepX = this.getGridStep(this.state.view.xMax - this.state.view.xMin), stepY = this.getGridStep(this.state.view.yMax - this.state.view.yMin); for (let x = Math.ceil(this.state.view.xMin / stepX) * stepX; x <= this.state.view.xMax; x += stepX) { const sx = this.worldToScreenX(x); ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, this.canvas.offsetHeight); ctx.stroke(); } for (let y = Math.ceil(this.state.view.yMin / stepY) * stepY; y <= this.state.view.yMax; y += stepY) { const sy = this.worldToScreenY(y); ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(this.canvas.offsetWidth, sy); ctx.stroke(); } }
+        drawAxes() { const ctx = this.ctx; ctx.strokeStyle = this.getColor('--text-secondary'); ctx.lineWidth = 1; const originX = this.worldToScreenX(0), originY = this.worldToScreenY(0); if (originX >= 0 && originX <= this.canvas.offsetWidth) { ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, this.canvas.offsetHeight); ctx.stroke(); } if (originY >= 0 && originY <= this.canvas.offsetHeight) { ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(this.canvas.offsetWidth, originY); ctx.stroke(); } this.drawLabels(); }
+        drawLabels() { const ctx = this.ctx; ctx.fillStyle = this.getColor('--text-secondary'); ctx.font = "12px 'JetBrains Mono', monospace"; const stepX = this.getGridStep(this.state.view.xMax - this.state.view.xMin); ctx.textAlign = "center"; ctx.textBaseline = "top"; const originY = this.worldToScreenY(0); for (let x = Math.ceil(this.state.view.xMin / stepX) * stepX; x <= this.state.view.xMax; x += stepX) { if (Math.abs(x) >= 1e-9) ctx.fillText(x.toPrecision(3).replace(/\.0+$/, ""), this.worldToScreenX(x), originY + 5); } const stepY = this.getGridStep(this.state.view.yMax - this.state.view.yMin); ctx.textAlign = "left"; ctx.textBaseline = "middle"; const originX = this.worldToScreenX(0); for (let y = Math.ceil(this.state.view.yMin / stepY) * stepY; y <= this.state.view.yMax; y += stepY) { if (Math.abs(y) >= 1e-9) ctx.fillText(y.toPrecision(3).replace(/\.0+$/, ""), originX + 5, this.worldToScreenY(y)); } }
+        drawFunction(func) { const compiled = this.compiledFunctions.get(func.id); if (!compiled || compiled.error) return; const ctx = this.ctx; ctx.strokeStyle = func.color; ctx.lineWidth = 2.5; ctx.beginPath(); let started = false; switch(func.type) { case 'parametric': { const tRange = 20, steps = 2000; for (let i = 0; i <= steps; i++) { const t = -tRange + (2 * tRange * i / steps); try { const x = compiled.original.x.evaluate({t}); const y = compiled.original.y.evaluate({t}); if (!isFinite(x) || !isFinite(y)) { started = false; continue; } const sx = this.worldToScreenX(x), sy = this.worldToScreenY(y); if (!started) { ctx.moveTo(sx, sy); started = true; } else { ctx.lineTo(sx, sy); } } catch (e) { started = false; } } break; } case 'polar': { const steps = 2000; for (let i = 0; i <= steps; i++) { const theta = (2 * Math.PI * i) / (steps/4); try { const r = compiled.original.r.evaluate({t: theta}); if (!isFinite(r)) { started = false; continue; } const x = r * Math.cos(theta), y = r * Math.sin(theta); const sx = this.worldToScreenX(x), sy = this.worldToScreenY(y); if (!started) { ctx.moveTo(sx, sy); started = true; } else { ctx.lineTo(sx, sy); } } catch (e) { started = false; } } break; } default: const step = (this.state.view.xMax - this.state.view.xMin) / (this.canvas.offsetWidth*2); for (let x = this.state.view.xMin; x <= this.state.view.xMax; x += step) { try { const y = compiled.original.y.evaluate({x}); if (!isFinite(y)) { started = false; continue; } const sx = this.worldToScreenX(x), sy = this.worldToScreenY(y); if (!started) { ctx.moveTo(sx, sy); started = true; } else { ctx.lineTo(sx, sy); } } catch (e) { started = false; } } } ctx.stroke(); }
+        drawCalculusFeatures() { const func = this.state.functions.find(f => f.id === this.state.target.functionId); if (!func) return; const compiled = this.compiledFunctions.get(func.id); if (!compiled || compiled.error) return; if (this.state.apps.showIntegral && func.type === 'cartesian') this.drawIntegralArea(compiled); if (this.state.analysis.showTangent && (this.lastMouseX !== undefined)) this.drawTangentLine(func, compiled); if (this.state.analysis.showDerivativePlot && func.type === 'cartesian') { this.plotGeneric(compiled.derivative, this.getColor('--purple'), 1.5, [4, 4]); } if(this.state.analysis.showNewton && func.type === 'cartesian') this.drawNewtonMethod(compiled); }
+        drawIntegralArea(compiled) { const { integralA: a, integralB: b } = this.state.apps; const ctx = this.ctx, minX = Math.min(a, b), maxX = Math.max(a, b); const step = (this.state.view.xMax - this.state.view.xMin) / (this.canvas.offsetWidth * 2); ctx.fillStyle = this.getColor('--warning') + '40'; ctx.beginPath(); const originY = this.worldToScreenY(0); ctx.moveTo(this.worldToScreenX(minX), originY); for (let x = minX; x <= maxX; x+=step) { try { const y = compiled.original.y.evaluate({x}); if (isFinite(y)) { ctx.lineTo(this.worldToScreenX(x), this.worldToScreenY(y)); } } catch(e){} } ctx.lineTo(this.worldToScreenX(maxX), originY); ctx.closePath(); ctx.fill(); }
+        drawTangentLine(func, compiled) { const { x, y } = this.getMouseWorldCoords(); if(!isFinite(x) || !isFinite(y)) return; const ctx = this.ctx; try { let x0, y0, slope; if (func.type === 'parametric') { const t = this.findTForClosestPoint(compiled, x, y); x0 = compiled.original.x.evaluate({t}); y0 = compiled.original.y.evaluate({t}); const dxdt = compiled.derivative.x.evaluate({t}); const dydt = compiled.derivative.y.evaluate({t}); slope = dydt / dxdt; } else { x0 = x; y0 = compiled.original.y.evaluate({x: x0}); slope = compiled.derivative.evaluate({x: x0}); } if (!isFinite(y0) || !isFinite(slope)) return; ctx.strokeStyle = this.getColor('--success'); ctx.lineWidth = 1.5; ctx.setLineDash([5,5]); const x1 = this.state.view.xMin, y1 = y0 + slope * (x1 - x0); const x2 = this.state.view.xMax, y2 = y0 + slope * (x2 - x0); ctx.beginPath(); ctx.moveTo(this.worldToScreenX(x1), this.worldToScreenY(y1)); ctx.lineTo(this.worldToScreenX(x2), this.worldToScreenY(y2)); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = this.getColor('--success'); ctx.beginPath(); ctx.arc(this.worldToScreenX(x0), this.worldToScreenY(y0), 5, 0, 2*Math.PI); ctx.fill(); } catch (e) {} }
+        drawNewtonMethod(compiled, maxIter = 5) { const ctx = this.ctx; let x_n = this.state.analysis.newtonX0; for (let i = 0; i < maxIter; i++) { try { const y_n = compiled.original.y.evaluate({x: x_n}); const slope = compiled.derivative.evaluate({x: x_n}); if (!isFinite(y_n) || !isFinite(slope) || Math.abs(slope) < 1e-9) break; const x_intercept = x_n - y_n / slope; ctx.strokeStyle = this.getColor('--blue') + (150 - i*20).toString(16); ctx.lineWidth = 1.5; ctx.setLineDash([5-i, 5-i]); ctx.beginPath(); ctx.moveTo(this.worldToScreenX(x_n), this.worldToScreenY(y_n)); ctx.lineTo(this.worldToScreenX(x_intercept), this.worldToScreenY(0)); ctx.stroke(); ctx.fillStyle = this.getColor('--blue'); ctx.beginPath(); ctx.arc(this.worldToScreenX(x_n), this.worldToScreenY(y_n), 4, 0, 2*Math.PI); ctx.fill(); if (Math.abs(x_n - x_intercept) < 1e-6) break; x_n = x_intercept; } catch(e) { break; } } ctx.setLineDash([]); }
+        drawAnalyzedPoints() { const ctx = this.ctx; this.analyzedPoints.forEach(p => { const sx = this.worldToScreenX(p.x), sy = this.worldToScreenY(p.y); if (sx < 0 || sx > this.canvas.offsetWidth || sy < 0 || sy > this.canvas.offsetHeight) return; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(sx, sy, 7, 0, 2*Math.PI); ctx.fill(); ctx.strokeStyle = this.getColor('--bg-panel'); ctx.lineWidth = 2; ctx.stroke(); }); }
+        plotGeneric(compiledFn, color, width, dash = []) { const ctx = this.ctx; ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash); ctx.beginPath(); let started = false; const step = (this.state.view.xMax - this.state.view.xMin) / (this.canvas.offsetWidth * 2); for (let x = this.state.view.xMin; x <= this.state.view.xMax; x += step) { try { const y = compiledFn.evaluate({x}); if (isFinite(y)) { const sx = this.worldToScreenX(x), sy = this.worldToScreenY(y); if (!started) { ctx.moveTo(sx, sy); started = true; } else { ctx.lineTo(sx, sy); } } else { started = false; } } catch (error) { started = false; } } ctx.stroke(); ctx.setLineDash([]); }
+        debounce(func, delay) { let timeoutId; return (...args) => { clearTimeout(timeoutId); timeoutId = setTimeout(() => { func.apply(this, args); }, delay); }; }
+        getMouseWorldCoords() { const rect = this.canvas.getBoundingClientRect(); if (this.lastMouseX === undefined || this.lastMouseY === undefined) return {}; return { x: this.screenToWorldX(this.lastMouseX - rect.left), y: this.screenToWorldY(this.lastMouseY - rect.top) } }
+        findTForClosestPoint(compiled, targetX, targetY, tRange = 20, steps = 500) { let bestT = 0, minDistSq = Infinity; for (let i = 0; i <= steps; i++) { const t = -tRange + (2 * tRange * i / steps); try { const x = compiled.original.x.evaluate({t}); const y = compiled.original.y.evaluate({t}); const distSq = (x - targetX)**2 + (y - targetY)**2; if (distSq < minDistSq) { minDistSq = distSq; bestT = t; } } catch (e) {} } return bestT; }
+        updateTooltip(sx, sy) { const hoverRadiusSq = 100; let closestPoint = null; let minDistSq = Infinity; this.analyzedPoints.forEach(p => { const pointSx = this.worldToScreenX(p.x); const pointSy = this.worldToScreenY(p.y); const distSq = (sx - pointSx)**2 + (sy - pointSy)**2; if (distSq < hoverRadiusSq && distSq < minDistSq) { minDistSq = distSq; closestPoint = p; } }); if (closestPoint) { this.tooltipEl.innerHTML = `<strong>${closestPoint.type}</strong>: (${closestPoint.x.toFixed(3)}, ${closestPoint.y.toFixed(3)})`; this.tooltipEl.style.left = `${sx + 15}px`; this.tooltipEl.style.top = `${sy}px`; this.tooltipEl.style.transform = 'translateY(-50%)'; this.tooltipEl.style.opacity = '1'; return; } const func = this.state.functions.find(f => f.id === this.state.target.functionId); const compiled = func ? this.compiledFunctions.get(func.id) : null; if (this.state.analysis.showTangent && func && compiled && !compiled.error) { const worldCoords = { x: this.screenToWorldX(sx), y: this.screenToWorldY(sy) }; try { let x0, y0, slope, tangentInfoHtml; if (func.type === 'parametric') { const t = this.findTForClosestPoint(compiled, worldCoords.x, worldCoords.y); x0 = compiled.original.x.evaluate({t}); y0 = compiled.original.y.evaluate({t}); const dxdt = compiled.derivative.x.evaluate({t}); const dydt = compiled.derivative.y.evaluate({t}); slope = dydt / dxdt; } else { x0 = worldCoords.x; y0 = compiled.original.y.evaluate({x: x0}); slope = compiled.derivative.evaluate({x: x0}); } if (isFinite(y0) && isFinite(slope)) { const intercept = y0 - slope * x0; const sign = intercept < 0 ? '-' : '+'; const eq = `y = ${slope.toFixed(3)}x ${sign} ${Math.abs(intercept).toFixed(3)}`; tangentInfoHtml = `<div class='text-left space-y-1' style='font-size: 0.8rem;'><div><strong>Point:</strong> (${x0.toFixed(3)}, ${y0.toFixed(3)})</div><div><strong>Slope:</strong> ${slope.toFixed(4)}</div><div><strong>Y-Intercept:</strong> ${intercept.toFixed(3)}</div><hr class='border-[var(--border-color)] !my-1'><div><strong>Equation:</strong> ${eq}</div></div>`; this.tooltipEl.innerHTML = tangentInfoHtml; this.tooltipEl.style.left = `${sx + 15}px`; this.tooltipEl.style.top = `${sy}px`; this.tooltipEl.style.transform = 'translateY(-50%)'; this.tooltipEl.style.opacity = '1'; return; } } catch (e) { } } this.tooltipEl.style.opacity = '0'; }
+        zoom(factor, pivotX, pivotY) { pivotX = pivotX ?? (this.state.view.xMin + this.state.view.xMax) / 2; pivotY = pivotY ?? (this.state.view.yMin + this.state.view.yMax) / 2; ['xMin', 'xMax', 'yMin', 'yMax'].forEach(key => { const pivot = key.includes('x') ? pivotX : pivotY; this.state.view[key] = (this.state.view[key] - pivot) * factor + pivot; }); this.updateViewInputs(); this.analyzeAllPoints(); this.requestDraw(); }
+        autoFitView() { let minY = Infinity, maxY = -Infinity, minX = Infinity, maxX = -Infinity; let hasPoints = false; this.state.functions.forEach(func => { if (!func.visible) return; const compiled = this.compiledFunctions.get(func.id); if (!compiled || compiled.error) return; if (func.type === 'cartesian') { const step = (this.state.view.xMax - this.state.view.xMin) / 500; minX = Math.min(minX, this.state.view.xMin); maxX = Math.max(maxX, this.state.view.xMax); for (let x = this.state.view.xMin; x <= this.state.view.xMax; x += step) { try { const y = compiled.original.y.evaluate({x}); if (isFinite(y)) { minY = Math.min(minY, y); maxY = Math.max(maxY, y); hasPoints = true;} } catch(e){} } } else { const tRange = func.type === 'polar' ? (2 * Math.PI * 2) : 20; const steps = 2000; for (let i = 0; i <= steps; i++) { const t = func.type === 'polar' ? (tRange * i / steps) : (-tRange + (2 * tRange * i / steps)); try { let x, y; if(func.type === 'parametric') { x = compiled.original.x.evaluate({t}); y = compiled.original.y.evaluate({t}); } else { const r = compiled.original.r.evaluate({t}); x = r * Math.cos(t); y = r * Math.sin(t); } if (isFinite(x) && isFinite(y)) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); hasPoints = true; } } catch(e) {} } } }); if (hasPoints && isFinite(minY)) { const xRange = maxX - minX; const yRange = maxY - minY; if (xRange === 0 || yRange === 0 || !isFinite(xRange) || !isFinite(yRange)) { this.resetView(); return; } const xPadding = xRange * 0.1 || 1; const yPadding = yRange * 0.1 || 1; this.state.view = { xMin: minX - xPadding, xMax: maxX + xPadding, yMin: minY - yPadding, yMax: maxY + yPadding }; this.updateViewInputs(); this.analyzeAllPoints(); this.requestDraw(); } }
+        reset() { this.state = this.getDefaultState(); history.pushState(null, "", window.location.pathname); this.compileAllFunctions(); this.analyzeAllPoints(); this.updateUI(); this.requestDraw(); this.parentApp.saveState(); }
+        resetView() { this.state.view = { ...this.defaultState.view }; this.updateViewInputs(); this.analyzeAllPoints(); this.requestDraw(); }
+        shareState() { try { const stateString = btoa(JSON.stringify(this.state)); const url = new URL(window.location); url.search = `?state=${stateString}`; url.hash = '#graphing'; navigator.clipboard.writeText(url.toString()); } catch (e) { console.error("Share failed", e); } }
+        exportCanvas() { this.requestDraw(); setTimeout(() => { const link = document.createElement('a'); link.download = 'calculus-odyssey-graph.png'; link.href = this.canvas.toDataURL('image/png'); link.click(); }, 100); }
+        worldToScreenX(x) { const { width } = this.canvas; const dpr = window.devicePixelRatio || 1; return ((x - this.state.view.xMin) / (this.state.view.xMax - this.state.view.xMin)) * (width / dpr); }
+        worldToScreenY(y) { const { height } = this.canvas; const dpr = window.devicePixelRatio || 1; return ((this.state.view.yMax - y) / (this.state.view.yMax - this.state.view.yMin)) * (height / dpr); }
+        screenToWorldX(sx) { const { width } = this.canvas; const dpr = window.devicePixelRatio || 1; return this.state.view.xMin + (sx / (width/dpr)) * (this.state.view.xMax - this.state.view.xMin); }
+        screenToWorldY(sy) { const { height } = this.canvas; const dpr = window.devicePixelRatio || 1; return this.state.view.yMax - (sy / (height/dpr)) * (this.state.view.yMax - this.state.view.yMin); }
+        getGridStep(range) { if(range <= 0) return 1; const exp = Math.floor(Math.log10(range)); const pow10 = Math.pow(10, exp); const rel = range / pow10; if (rel < 2) return pow10 / 5; if (rel < 5) return pow10 / 2; return pow10; }
+        toggleSetting(setting) { let category = null; if (this.state.analysis.hasOwnProperty(setting)) category = this.state.analysis; else if (this.state.apps.hasOwnProperty(setting)) category = this.state.apps; else if (this.state.settings.hasOwnProperty(setting)) category = this.state.settings; if (category) { category[setting] = !category[setting]; document.querySelector(`[data-setting="${setting}"]`).classList.toggle('active', category[setting]); this.analyzeAllPoints(); this.requestDraw(); } }
+        getColor(cssVar) { return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim(); }
+    }
+    </script>
+    <footer class="backdrop-blur-md bg-white/10 border-t border-white/20 text-gray-200 py-6 text-center hidden lg:block">
+      <p class="text-sm drop-shadow-md mb-2">
+        Developed by <span class="font-semibold text-white">Sadeepa Lakshan</span>
+      </p>
+      
+      <div class="flex justify-center space-x-6 mb-2">
+        <a href="https://github.com/sadeepas" target="_blank" class="hover:text-white transition"><i class="fab fa-github text-xl"></i></a>
+        <a href="https://www.linkedin.com/in/sadeepa-lakshan/" target="_blank" class="hover:text-white transition"><i class="fab fa-linkedin text-xl"></i></a>
+        <a href="mailto:sadeepapemasiri2@gmai.com" class="hover:text-white transition"><i class="fas fa-envelope text-xl"></i></a>
+      </div>
+
+      <p class="text-xs text-gray-300 drop-shadow-sm">
+        &copy; <span id="year"></span> All Rights Reserved
+      </p>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
